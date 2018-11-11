@@ -31,6 +31,14 @@ namespace PlayerXP
 			return false;
 		}
 
+		private Player FindPlayer(string steamid)
+		{
+			foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+				if (player.SteamId == steamid)
+					return player;
+			return null;
+		}
+
 		private void AddXP(string steamid, int xp)
 		{
 			int lineNum = PlayerXP.GetLine(steamid);
@@ -42,6 +50,8 @@ namespace PlayerXP
 			{
 				currXP -= level * 250 + 750;
 				level++;
+				Player player = FindPlayer(steamid);
+				player.SendConsoleMessage("You've leveled up to level " + level.ToString() + "!" + " You need " + ((level * 250 + 750) - currXP).ToString() + "xp for your next level.");
 			}
 			players[lineNum] = players[lineNum].Split(':')[0] + ":" + level.ToString() + ":" + currXP.ToString();
 
