@@ -20,6 +20,7 @@ namespace PlayerXP
 	public class PlayerXP : Plugin
 	{
 		public static Plugin plugin;
+		public static float xpScale;
 		public static string XPPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/SCP Secret Laboratory/PlayerXP";
 		public static string XPDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt";
 
