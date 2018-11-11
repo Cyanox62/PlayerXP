@@ -22,4 +22,4 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 
 | Command        | Value Type | Description |
 | :-------------: | :---------: | :------ |
-| LVL / LEVEL | PLAYER NAME / STEAMID | Displayes a user's level and xp. |
+| LVL / LEVEL | PLAYER NAME / STEAMID64 | Displayes a user's level and xp. |
