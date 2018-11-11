@@ -84,11 +84,13 @@ namespace PlayerXP
 					gainedXP = DClassXP.NineTailedFoxKill;
 				if (ev.Player.TeamRole.Team == Team.SCP)
 					gainedXP = DClassXP.SCPKill;
+				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+					gainedXP = DClassXP.TutorialKill;
 
 				if (gainedXP > 0)
 				{
-					AddXP(ev.Killer.SteamId, gainedXP);
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, gainedXP);
 				}
 			}
 
@@ -101,11 +103,13 @@ namespace PlayerXP
 					gainedXP = ScientistXP.ChaosKill;
 				if (ev.Player.TeamRole.Team == Team.SCP)
 					gainedXP = ScientistXP.SCPKill;
+				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+					gainedXP = ScientistXP.TutorialKill;
 
 				if (gainedXP > 0)
 				{
-					AddXP(ev.Killer.SteamId, gainedXP);
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, gainedXP);
 				}
 			}
 
@@ -118,11 +122,13 @@ namespace PlayerXP
 					gainedXP = NineTailedFoxXP.ChaosKill;
 				if (ev.Player.TeamRole.Team == Team.SCP)
 					gainedXP = NineTailedFoxXP.SCPKill;
+				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+					gainedXP = NineTailedFoxXP.TutorialKill;
 
 				if (gainedXP > 0)
 				{
-					AddXP(ev.Killer.SteamId, gainedXP);
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, gainedXP);
 				}
 			}
 
@@ -135,11 +141,13 @@ namespace PlayerXP
 					gainedXP = ChaosXP.NineTailedFoxKill;
 				if (ev.Player.TeamRole.Team == Team.SCP)
 					gainedXP = ChaosXP.SCPKill;
+				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+					gainedXP = ChaosXP.TutorialKill;
 
 				if (gainedXP > 0)
 				{
-					AddXP(ev.Killer.SteamId, gainedXP);
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, gainedXP);
 				}
 			}
 
@@ -157,8 +165,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0)
 				{
-					AddXP(ev.Killer.SteamId, gainedXP);
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, gainedXP);
 				}
 			}
 
@@ -166,8 +174,8 @@ namespace PlayerXP
 			{
 				if (AllXP.SCPKillPlayer > 0)
 				{
-					AddXP(ev.Killer.SteamId, AllXP.SCPKillPlayer);
 					ev.Killer.SendConsoleMessage("You have gained " + AllXP.SCPKillPlayer.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
+					AddXP(ev.Killer.SteamId, AllXP.SCPKillPlayer);
 				}
 
 				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Team.TUTORIAL)
@@ -176,8 +184,8 @@ namespace PlayerXP
 					{
 						if (player.TeamRole.Role == Role.TUTORIAL)
 						{
-							AddXP(player.SteamId, TutorialXP.SCPKillsPlayer);
 							player.SendConsoleMessage("You have gained " + TutorialXP.SCPKillsPlayer.ToString() + "xp for an SCP killing an enemy!", "yellow");
+							AddXP(player.SteamId, TutorialXP.SCPKillsPlayer);
 						}
 					}
 				}
@@ -197,9 +205,9 @@ namespace PlayerXP
 				{
 					if (player.TeamRole.Role == Role.SCP_106)
 					{
-						AddXP(player.SteamId, SCP106XP.DeathInPD);
 						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
 						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString() + ".", "yellow");
+						AddXP(player.SteamId, SCP106XP.DeathInPD);
 					}
 				}
 			}
@@ -209,8 +217,8 @@ namespace PlayerXP
 		{
 			if (SCP049XP.ZombieCreated > 0)
 			{
-				AddXP(ev.Player.SteamId, SCP049XP.ZombieCreated);
 				ev.Player.SendConsoleMessage("You have gained " + SCP049XP.ZombieCreated.ToString() + "xp for turning " + ev.Target.Name + " into a zombie!", "yellow");
+				AddXP(ev.Player.SteamId, SCP049XP.ZombieCreated);
 			}
 		}
 
@@ -220,8 +228,8 @@ namespace PlayerXP
 			{
 				if (DClassXP.Escape > 0)
 				{
-					AddXP(ev.Player.SteamId, DClassXP.Escape);
 					ev.Player.SendConsoleMessage("You have gained " + DClassXP.Escape.ToString() + "xp for escaping as a Class-D!", "yellow");
+					AddXP(ev.Player.SteamId, DClassXP.Escape);
 				}
 
 				if (ChaosXP.DClassEscape > 0)
@@ -230,8 +238,8 @@ namespace PlayerXP
 					{
 						if (player.TeamRole.Team == Team.CHAOS_INSURGENCY)
 						{
-							AddXP(player.SteamId, ChaosXP.DClassEscape);
 							player.SendConsoleMessage("You have gained " + ChaosXP.DClassEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Class-D!", "yellow");
+							AddXP(player.SteamId, ChaosXP.DClassEscape);
 						}
 					}
 				}
@@ -241,8 +249,8 @@ namespace PlayerXP
 			{
 				if (ScientistXP.Escape > 0)
 				{
-					AddXP(ev.Player.SteamId, ScientistXP.Escape);
 					ev.Player.SendConsoleMessage("You have gained " + ScientistXP.Escape.ToString() + "xp for escaping as a Scientist!", "yellow");
+					AddXP(ev.Player.SteamId, ScientistXP.Escape);
 				}
 
 				if (NineTailedFoxXP.ScientistEscape > 0)
@@ -251,8 +259,8 @@ namespace PlayerXP
 					{
 						if (player.TeamRole.Team == Team.NINETAILFOX)
 						{
-							AddXP(player.SteamId, NineTailedFoxXP.ScientistEscape);
 							player.SendConsoleMessage("You have gained " + NineTailedFoxXP.ScientistEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Scientist!", "yellow");
+							AddXP(player.SteamId, NineTailedFoxXP.ScientistEscape);
 						}
 					}
 				}
@@ -267,8 +275,8 @@ namespace PlayerXP
 				{
 					if (player.TeamRole.Team != Team.SPECTATOR && player.TeamRole.Team != Team.NONE && roundStarted)
 					{
-						AddXP(player.SteamId, AllXP.RoundWinXP);
 						player.SendConsoleMessage("You have gained " + AllXP.RoundWinXP.ToString() + "xp for winning the round!", "yellow");
+						AddXP(player.SteamId, AllXP.RoundWinXP);
 					}
 				}
 			}
