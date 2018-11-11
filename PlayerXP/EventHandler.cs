@@ -127,7 +127,7 @@ namespace PlayerXP
 			}
 
 			if (ev.Player.Name != ev.Killer.Name && ev.Killer != null)
-				ev.Player.SendConsoleMessage("You were killed by " + ev.Killer.Name + ", level " + PlayerXP.GetLevel(ev.Killer.SteamId).ToString());
+				ev.Player.SendConsoleMessage("You were killed by " + ev.Killer.Name + ", level " + PlayerXP.GetLevel(ev.Killer.SteamId).ToString() + ".");
 		}
 
 		public void OnPocketDimensionDie(PlayerPocketDimensionDieEvent ev)
@@ -137,7 +137,7 @@ namespace PlayerXP
 				if (player.TeamRole.Role == Role.SCP_106)
 				{
 					AddXP(player.SteamId, SCP106XP.DeathInPD);
-					ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString());
+					ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString() + ".");
 				}
 			}
 		}
