@@ -45,13 +45,14 @@ namespace PlayerXP
 			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
 			int level = Int32.Parse(players[lineNum].Split(':')[1]);
 			int currXP = Int32.Parse(players[lineNum].Split(':')[2]);
-			currXP += xp;
+
+			currXP += xp * (int)plugin.GetConfigFloat("xp_scale");
+			plugin.Info(currXP.ToString());
 			if (currXP >= level * 250 + 750)
 			{
 				currXP -= level * 250 + 750;
 				level++;
-				Player player = FindPlayer(steamid);
-				player.SendConsoleMessage("You've leveled up to level " + level.ToString() + "!" + " You need " + ((level * 250 + 750) - currXP).ToString() + "xp for your next level.");
+				FindPlayer(steamid).SendConsoleMessage("You've leveled up to level " + level.ToString() + "!" + " You need " + ((level * 250 + 750) - currXP).ToString() + "xp for your next level.");
 			}
 			players[lineNum] = players[lineNum].Split(':')[0] + ":" + level.ToString() + ":" + currXP.ToString();
 
@@ -76,9 +77,8 @@ namespace PlayerXP
 		{
 			if (ev.Killer.TeamRole.Team == Team.CLASSD)
 			{
-				int xpGained = 0;
 				if (ev.Player.TeamRole.Team == Team.SCIENTISTS)
-					xpGained = DClassXP.ScientistKill;
+					AddXP(ev.Killer.SteamId, DClassXP.ScientistKill);
 				if (ev.Player.TeamRole.Team == Team.NINETAILFOX)
 					AddXP(ev.Killer.SteamId, DClassXP.NineTailedFoxKill);
 				if (ev.Player.TeamRole.Team == Team.SCP)
@@ -136,8 +136,10 @@ namespace PlayerXP
 						AddXP(player.SteamId, TutorialXP.SCPKillsPlayer);
 			}
 
-			if (ev.Player.Name != ev.Killer.Name && ev.Killer != null)
+			if (ev.Player.Name != ev.Killer.Name && ev.Killer != null && ev.Killer.SteamId != string.Empty)
 				ev.Player.SendConsoleMessage("You were killed by " + ev.Killer.Name + ", level " + PlayerXP.GetLevel(ev.Killer.SteamId).ToString() + ".");
+			if (ev.Player != null && ev.Player.SteamId != string.Empty)
+				ev.Player.SendConsoleMessage("You have " + PlayerXP.GetXP(ev.Player.SteamId) + "/" + PlayerXP.XpToLevelUp(ev.Player.SteamId) + " until you reach level " + (PlayerXP.GetLevel(ev.Player.SteamId) + 1).ToString() + ".");
 		}
 
 		public void OnPocketDimensionDie(PlayerPocketDimensionDieEvent ev)

@@ -50,6 +50,8 @@ namespace PlayerXP
 			AddEventHandlers(new EventHandler(this));
 			this.AddCommands(new string[] { "lvl", "level" }, new LevelCommand(this));
 
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 3.0f, Smod2.Config.SettingType.FLOAT, true, ""));
+
 			// All
 			this.AddConfig(new Smod2.Config.ConfigSetting("all_round_win", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
 			this.AddConfig(new Smod2.Config.ConfigSetting("scp_kill_player", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
@@ -126,6 +128,15 @@ namespace PlayerXP
 		{
 			int lineNum = GetLine(steamid);
 			return Int32.Parse(File.ReadAllLines(PlayerXP.XPDataPath)[lineNum].Split(':')[2]);
+		}
+
+		public static int XpToLevelUp(string steamid)
+		{
+			string line = File.ReadAllLines(XPDataPath)[GetLine(steamid)];
+			int lvl = Int32.Parse(line.Split(':')[1]);
+			int currXP = Int32.Parse(line.Split(':')[2]);
+
+			return lvl * 250 + 750;
 		}
 
 		public static int LevenshteinDistance(string s, string t)
