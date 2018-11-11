@@ -18,3 +18,7 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 * When a player is killed, the victim gets an output in their console saying the killers name and level
 * All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt`
 * Levels transfer between MultiAdmin servers
+
+| Command        | Value Type | Description |
+| :-------------: | :---------: | :------ |
+| LVL / LEVEL | PLAYER NAME / STEAMID | Lists all commands. |
