@@ -32,7 +32,7 @@ namespace PlayerXP
 			if (IsLinux)
 			{
 				XPPath = "/home/" + Environment.UserName + "/.config/SCP Secret Laboratory/PlayerXP";
-				XPDataPath = "/home/" + Environment.UserName + "/.config/SCP Secret Laboratory/CustomAnnouncements/PlayerXP/PlayerXPData.txt";
+				XPDataPath = "/home/" + Environment.UserName + "/.config/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt";
 			}
 
 			if (!Directory.Exists(XPPath))
