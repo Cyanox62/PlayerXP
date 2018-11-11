@@ -1,6 +1,6 @@
 # PlayerXP
 
-A plugin that adds a leveling system to your server. Users start at level 1, and gain experience through doing tasks such as escaping as a classd or scientist, winning the round, killing an SCP, etc. A full list of these tasks can be found [https://github.com/Cyanox62/PlayerXP/wiki/XP-Config-Settings]here.
+A plugin that adds a leveling system to your server. Users start at level 1, and gain experience through doing tasks such as escaping as a classd or scientist, winning the round, killing an SCP, etc. A full list of these tasks can be found [here](https://github.com/Cyanox62/PlayerXP/wiki/XP-Config-Settings).
 
 # Installation
 
