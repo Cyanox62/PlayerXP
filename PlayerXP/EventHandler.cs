@@ -203,7 +203,7 @@ namespace PlayerXP
 			{
 				foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 				{
-					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId)
+					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player != null)
 					{
 						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
 						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString() + ".", "yellow");
@@ -215,7 +215,7 @@ namespace PlayerXP
 
 		public void OnRecallZombie(PlayerRecallZombieEvent ev)
 		{
-			if (SCP049XP.ZombieCreated > 0)
+			if (SCP049XP.ZombieCreated > 0 && ev.Player.SteamId != ev.Target.SteamId)
 			{
 				ev.Player.SendConsoleMessage("You have gained " + SCP049XP.ZombieCreated.ToString() + "xp for turning " + ev.Target.Name + " into a zombie!", "yellow");
 				AddXP(ev.Player.SteamId, SCP049XP.ZombieCreated);
