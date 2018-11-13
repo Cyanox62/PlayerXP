@@ -87,7 +87,7 @@ namespace PlayerXP
 				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
 					gainedXP = DClassXP.TutorialKill;
 
-				if (gainedXP > 0)
+				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, gainedXP);
@@ -106,7 +106,7 @@ namespace PlayerXP
 				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
 					gainedXP = ScientistXP.TutorialKill;
 
-				if (gainedXP > 0)
+				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, gainedXP);
@@ -125,7 +125,7 @@ namespace PlayerXP
 				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
 					gainedXP = NineTailedFoxXP.TutorialKill;
 
-				if (gainedXP > 0)
+				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, gainedXP);
@@ -144,7 +144,7 @@ namespace PlayerXP
 				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
 					gainedXP = ChaosXP.TutorialKill;
 
-				if (gainedXP > 0)
+				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, gainedXP);
@@ -163,7 +163,7 @@ namespace PlayerXP
 				if (ev.Player.TeamRole.Team == Team.CHAOS_INSURGENCY)
 					gainedXP = TutorialXP.ChaosKill;
 
-				if (gainedXP > 0)
+				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, gainedXP);
@@ -172,13 +172,13 @@ namespace PlayerXP
 
 			if (ev.Killer.TeamRole.Team == Team.SCP)
 			{
-				if (AllXP.SCPKillPlayer > 0)
+				if (AllXP.SCPKillPlayer > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					ev.Killer.SendConsoleMessage("You have gained " + AllXP.SCPKillPlayer.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
 					AddXP(ev.Killer.SteamId, AllXP.SCPKillPlayer);
 				}
 
-				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Team.TUTORIAL)
+				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Team.TUTORIAL && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
@@ -203,7 +203,7 @@ namespace PlayerXP
 			{
 				foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 				{
-					if (player.TeamRole.Role == Role.SCP_106)
+					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId)
 					{
 						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
 						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString() + ".", "yellow");
