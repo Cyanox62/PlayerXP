@@ -75,16 +75,16 @@ namespace PlayerXP
 
 		public void OnPlayerDie(PlayerDeathEvent ev)
 		{
-			if (ev.Killer.TeamRole.Team == Team.CLASSD)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CLASSD)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
 					gainedXP = DClassXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Team.NINETAILFOX)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = DClassXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
 					gainedXP = DClassXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 					gainedXP = DClassXP.TutorialKill;
 
 				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
@@ -94,16 +94,16 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Team.SCIENTISTS)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Team.CLASSD)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
 					gainedXP = ScientistXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Team.CHAOS_INSURGENCY)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 					gainedXP = ScientistXP.ChaosKill;
-				if (ev.Player.TeamRole.Team == Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
 					gainedXP = ScientistXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 					gainedXP = ScientistXP.TutorialKill;
 
 				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
@@ -113,16 +113,16 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Team.NINETAILFOX)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Team.CLASSD)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
 					gainedXP = NineTailedFoxXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Team.CHAOS_INSURGENCY)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 					gainedXP = NineTailedFoxXP.ChaosKill;
-				if (ev.Player.TeamRole.Team == Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
 					gainedXP = NineTailedFoxXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 					gainedXP = NineTailedFoxXP.TutorialKill;
 
 				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
@@ -132,16 +132,16 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Team.CHAOS_INSURGENCY)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
 					gainedXP = ChaosXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Team.NINETAILFOX)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = ChaosXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
 					gainedXP = ChaosXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Team.TUTORIAL)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 					gainedXP = ChaosXP.TutorialKill;
 
 				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
@@ -151,16 +151,16 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Team.TUTORIAL)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Team.CLASSD)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
 					gainedXP = TutorialXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
 				    gainedXP = TutorialXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Team.NINETAILFOX)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = TutorialXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Team.CHAOS_INSURGENCY)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 					gainedXP = TutorialXP.ChaosKill;
 
 				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
@@ -170,7 +170,7 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Team.SCP)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCP)
 			{
 				if (AllXP.SCPKillPlayer > 0 && ev.Player.SteamId != ev.Killer.SteamId)
 				{
@@ -178,7 +178,7 @@ namespace PlayerXP
 					AddXP(ev.Killer.SteamId, AllXP.SCPKillPlayer);
 				}
 
-				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Team.TUTORIAL && ev.Player.SteamId != ev.Killer.SteamId)
+				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Smod2.API.Team.TUTORIAL && ev.Player.SteamId != ev.Killer.SteamId)
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
@@ -236,7 +236,7 @@ namespace PlayerXP
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
-						if (player.TeamRole.Team == Team.CHAOS_INSURGENCY)
+						if (player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 						{
 							player.SendConsoleMessage("You have gained " + ChaosXP.DClassEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Class-D!", "yellow");
 							AddXP(player.SteamId, ChaosXP.DClassEscape);
@@ -257,7 +257,7 @@ namespace PlayerXP
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
-						if (player.TeamRole.Team == Team.NINETAILFOX)
+						if (player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 						{
 							player.SendConsoleMessage("You have gained " + NineTailedFoxXP.ScientistEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Scientist!", "yellow");
 							AddXP(player.SteamId, NineTailedFoxXP.ScientistEscape);
@@ -273,7 +273,7 @@ namespace PlayerXP
 			{
 				foreach (Player player in plugin.Server.GetPlayers())
 				{
-					if (player.TeamRole.Team != Team.SPECTATOR && player.TeamRole.Team != Team.NONE && roundStarted)
+					if (player.TeamRole.Team != Smod2.API.Team.SPECTATOR && player.TeamRole.Team != Smod2.API.Team.NONE && roundStarted)
 					{
 						player.SendConsoleMessage("You have gained " + AllXP.RoundWinXP.ToString() + "xp for winning the round!", "yellow");
 						AddXP(player.SteamId, AllXP.RoundWinXP);

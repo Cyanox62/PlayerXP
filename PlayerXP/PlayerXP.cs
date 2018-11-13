@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using Smod2;
 using Smod2.Attributes;
 using Smod2.API;
@@ -21,20 +20,14 @@ namespace PlayerXP
 	{
 		public static Plugin plugin;
 		public static float xpScale;
-		public static string XPPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/SCP Secret Laboratory/PlayerXP";
-		public static string XPDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt";
+		public static string XPPath = FileManager.GetAppFolder() + "PlayerXP";
+		public static string XPDataPath = FileManager.GetAppFolder() + "PlayerXP/PlayerXPData.txt";
 
 		public override void OnDisable() { }
 
 		public override void OnEnable()
 		{
 			plugin = this;
-
-			if (IsLinux)
-			{
-				XPPath = "/home/" + Environment.UserName + "/.config/SCP Secret Laboratory/PlayerXP";
-				XPDataPath = "/home/" + Environment.UserName + "/.config/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt";
-			}
 
 			if (!Directory.Exists(XPPath))
 			{
@@ -98,15 +91,6 @@ namespace PlayerXP
 			// SCP-049
 			this.AddConfig(new Smod2.Config.ConfigSetting("scp049_zombie_created", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
-		}
-
-		public static bool IsLinux
-		{
-			get
-			{
-				int p = (int)Environment.OSVersion.Platform;
-				return (p == 4) || (p == 6) || (p == 128);
-			}
 		}
 
 		public static int GetLine(string steamid)
