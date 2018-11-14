@@ -3,6 +3,7 @@ using System.IO;
 using Smod2;
 using Smod2.Attributes;
 using Smod2.API;
+using System.Collections.Generic;
 
 namespace PlayerXP
 {
@@ -37,6 +38,8 @@ namespace PlayerXP
 			{
 				using (new StreamWriter(File.Create(XPDataPath))) { }
 			}
+
+			RemoveLvlZero();
 		}
 
 		public override void Register()
@@ -126,6 +129,28 @@ namespace PlayerXP
 			int currXP = Int32.Parse(line.Split(':')[2]);
 
 			return lvl * 250 + 750;
+		}
+
+		public static void RemoveLvlZero()
+		{
+			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
+			List<string> playerList = new List<string>(players);
+			int count = 0;
+			foreach (string steamid in players)
+			{
+				string sid = steamid.Split(':')[0];
+				if (GetLevel(sid) == 1 && GetXP(sid) == 0)
+				{
+					plugin.Info("REMOVING: " + steamid);
+					count++;
+					playerList.Remove(steamid);
+				}
+			}
+
+			plugin.Info(count.ToString());
+
+			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
+			File.WriteAllLines(PlayerXP.XPDataPath, playerList.ToArray());
 		}
 
 		public static int LevenshteinDistance(string s, string t)
