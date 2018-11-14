@@ -50,49 +50,49 @@ namespace PlayerXP
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 1.0f, Smod2.Config.SettingType.FLOAT, true, ""));
 
 			// All
-			this.AddConfig(new Smod2.Config.ConfigSetting("all_round_win", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("scp_kill_player", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_all_round_win", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp_kill_player", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// Class-D
-			this.AddConfig(new Smod2.Config.ConfigSetting("dclass_scientist_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("dclass_mtf_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("dclass_scp_kill", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("dclass_tutorial_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("dclass_escape", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_scientist_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_mtf_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_scp_kill", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_tutorial_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_escape", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// Scientist
-			this.AddConfig(new Smod2.Config.ConfigSetting("scientist_dclass_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("scientist_chaos_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("scientist_scp_kill", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("scientist_tutorial_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("scientist_escape", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scientist_dclass_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scientist_chaos_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scientist_scp_kill", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scientist_tutorial_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scientist_escape", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// MTF
-			this.AddConfig(new Smod2.Config.ConfigSetting("mtf_dclass_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("mtf_chaos_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("mtf_scp_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("mtf_tutorial_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("mtf_scientist_escape", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_mtf_dclass_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_mtf_chaos_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_mtf_scp_kill", 100, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_mtf_tutorial_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_mtf_scientist_escape", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// Chaos
-			this.AddConfig(new Smod2.Config.ConfigSetting("chaos_scientist_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("chaos_mtf_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("chaos_scp_kill", 75, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("chaos_tutorial_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("chaos_dclass_escape", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_chaos_scientist_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_chaos_mtf_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_chaos_scp_kill", 75, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_chaos_tutorial_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_chaos_dclass_escape", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// Tutorial
-			this.AddConfig(new Smod2.Config.ConfigSetting("tutorial_dclass_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("tutorial_scientist_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("tutorial_mtf_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("tutorial_chaos_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
-			this.AddConfig(new Smod2.Config.ConfigSetting("tutorial_scp_kills_player", 10, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_tutorial_dclass_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_tutorial_scientist_kill", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_tutorial_mtf_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_tutorial_chaos_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_tutorial_scp_kills_player", 10, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// SCP-106
-			this.AddConfig(new Smod2.Config.ConfigSetting("scp106_pocket_death", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp106_pocket_death", 50, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// SCP-049
-			this.AddConfig(new Smod2.Config.ConfigSetting("scp049_zombie_created", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp049_zombie_created", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 		}
 
