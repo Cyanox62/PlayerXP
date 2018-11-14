@@ -135,19 +135,14 @@ namespace PlayerXP
 		{
 			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
 			List<string> playerList = new List<string>(players);
-			int count = 0;
 			foreach (string steamid in players)
 			{
 				string sid = steamid.Split(':')[0];
 				if (GetLevel(sid) == 1 && GetXP(sid) == 0)
 				{
-					plugin.Info("REMOVING: " + steamid);
-					count++;
 					playerList.Remove(steamid);
 				}
 			}
-
-			plugin.Info(count.ToString());
 
 			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
 			File.WriteAllLines(PlayerXP.XPDataPath, playerList.ToArray());
