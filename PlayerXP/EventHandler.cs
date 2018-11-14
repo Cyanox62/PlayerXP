@@ -232,7 +232,7 @@ namespace PlayerXP
 					AddXP(ev.Player.SteamId, DClassXP.Escape);
 				}
 
-				if (ChaosXP.DClassEscape > 0)
+				if (ChaosXP.DClassEscape > 0 && !ev.Player.IsHandcuffed())
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
@@ -253,7 +253,7 @@ namespace PlayerXP
 					AddXP(ev.Player.SteamId, ScientistXP.Escape);
 				}
 
-				if (NineTailedFoxXP.ScientistEscape > 0)
+				if (NineTailedFoxXP.ScientistEscape > 0 && !ev.Player.IsHandcuffed())
 				{
 					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 					{
