@@ -203,7 +203,7 @@ namespace PlayerXP
 			{
 				foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 				{
-					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player != null)
+					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player != null && ev.Player != null)
 					{
 						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
 						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " + PlayerXP.GetLevel(player.SteamId).ToString() + ".", "yellow");
