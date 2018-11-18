@@ -51,6 +51,7 @@
     <Compile Include="LevelCommand.cs" />
     <Compile Include="PlayerXP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopLevelCommand.cs" />
     <Compile Include="XPAmounts.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

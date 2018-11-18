@@ -45,7 +45,15 @@ namespace PlayerXP
 					{
 						return new string[] { "Error: invalid player." };
 					}
-					return new string[] { "User: " + steamid, "Level: " + PlayerXP.GetLevel(steamid), "XP: " + PlayerXP.GetXP(steamid) };
+					string name;
+					Player tempPlayer = PlayerXP.GetPlayer(steamid);
+					if (tempPlayer != null)
+						name = "\"" + tempPlayer.Name + "\"";
+					else
+						name = "Unconnected";
+					
+
+					return new string[] { "Player: " + name + " ("+ steamid + ")", "Level: " + PlayerXP.GetLevel(steamid), "XP: " + PlayerXP.GetXP(steamid) + "/" + PlayerXP.XpToLevelUp(steamid) };
 				}
 			}
 			return new string[] { GetUsage() };

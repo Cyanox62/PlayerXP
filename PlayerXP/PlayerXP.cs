@@ -46,6 +46,7 @@ namespace PlayerXP
 		{
 			AddEventHandlers(new EventHandler(this));
 			this.AddCommands(new string[] { "lvl", "level" }, new LevelCommand(this));
+			this.AddCommands(new string[] { "toplvl", "toplevel" }, new TopLevelCommand(this));
 
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 1.0f, Smod2.Config.SettingType.FLOAT, true, ""));
 
@@ -129,6 +130,20 @@ namespace PlayerXP
 			int currXP = Int32.Parse(line.Split(':')[2]);
 
 			return lvl * 250 + 750;
+		}
+
+		public static Player GetPlayer(string steamid)
+		{
+			Player pl = null;
+			foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+			{
+				if (player.SteamId == steamid)
+				{
+					pl = player;
+					break;
+				}
+			}
+			return pl;
 		}
 
 		public static void RemoveLvlZero()
