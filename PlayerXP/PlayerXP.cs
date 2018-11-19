@@ -12,7 +12,7 @@ namespace PlayerXP
 	name = "Player XP",
 	description = "A plugin that lets players collect XP and level up.",
 	id = "cyan.playerxp",
-	version = "0.6",
+	version = "0.7",
 	SmodMajor = 3,
 	SmodMinor = 0,
 	SmodRevision = 0
@@ -53,6 +53,7 @@ namespace PlayerXP
 			// All
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_all_round_win", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp_kill_player", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_team_kill_punishment", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
 
 			// Class-D
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_dclass_scientist_kill", 50, Smod2.Config.SettingType.NUMERIC, true, ""));

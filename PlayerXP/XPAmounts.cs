@@ -4,6 +4,7 @@
 	{
 		public static int RoundWinXP = (int)(PlayerXP.plugin.GetConfigInt("xp_all_round_win") * PlayerXP.xpScale);
 		public static int SCPKillPlayer = (int)(PlayerXP.plugin.GetConfigInt("xp_scp_kill_player") * PlayerXP.xpScale);
+		public static int TeamKillPunishment = (int)(PlayerXP.plugin.GetConfigInt("xp_team_kill_punishment") * PlayerXP.xpScale);
 	}
 	static class DClassXP
 	{

@@ -59,6 +59,33 @@ namespace PlayerXP
 			File.WriteAllLines(PlayerXP.XPDataPath, players);
 		}
 
+		private void RemoveXP(string steamid, int xp)
+		{
+			int lineNum = PlayerXP.GetLine(steamid);
+			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
+			int level = Int32.Parse(players[lineNum].Split(':')[1]);
+			int currXP = Int32.Parse(players[lineNum].Split(':')[2]);
+
+			currXP -= xp;
+			if (currXP <= 0)
+			{
+				if (level > 1)
+				{
+					level--;
+					currXP = (level * 250 + 750) - Math.Abs(currXP);
+				}
+				else
+				{
+					currXP = 0;
+				}
+			}
+
+			players[lineNum] = players[lineNum].Split(':')[0] + ":" + level.ToString() + ":" + currXP.ToString();
+
+			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
+			File.WriteAllLines(PlayerXP.XPDataPath, players);
+		}
+
 		public void OnRoundStart(RoundStartEvent ev)
 		{
 			roundStarted = true;
@@ -75,6 +102,12 @@ namespace PlayerXP
 
 		public void OnPlayerDie(PlayerDeathEvent ev)
 		{
+			if (ev.Killer.TeamRole.Team == ev.Player.TeamRole.Team && ev.Killer.SteamId != ev.Player.SteamId && AllXP.TeamKillPunishment > 0)
+			{
+				ev.Killer.SendConsoleMessage("You have lost " + AllXP.TeamKillPunishment.ToString() + "xp for teamkilling " + ev.Player.Name + ".", "yellow");
+				RemoveXP(ev.Killer.SteamId, AllXP.TeamKillPunishment);
+			}
+
 			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CLASSD)
 			{
 				int gainedXP = 0;
