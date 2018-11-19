@@ -102,7 +102,7 @@ namespace PlayerXP
 
 		public void OnPlayerDie(PlayerDeathEvent ev)
 		{
-			if (ev.Killer.TeamRole.Team == ev.Player.TeamRole.Team && ev.Killer.SteamId != ev.Player.SteamId && AllXP.TeamKillPunishment > 0)
+			if (ev.Killer.TeamRole.Team == ev.Player.TeamRole.Team && ev.Killer.SteamId != ev.Player.SteamId && roundStarted && AllXP.TeamKillPunishment > 0)
 			{
 				ev.Killer.SendConsoleMessage("You have lost " + AllXP.TeamKillPunishment.ToString() + "xp for teamkilling " + ev.Player.Name + ".", "yellow");
 				RemoveXP(ev.Killer.SteamId, AllXP.TeamKillPunishment);
