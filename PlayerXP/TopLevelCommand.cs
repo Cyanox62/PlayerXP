@@ -36,11 +36,20 @@ namespace PlayerXP
 				string[] temp = steamid.Split(':');
 				int level = Int32.Parse(temp[1]);
 				int xp = Int32.Parse(temp[2]);
-				if (level > highestLevel && xp > highestXP)
+				if (level > highestLevel)
 				{
 					highestSteamID = temp[0];
 					highestLevel = level;
 					highestXP = xp;
+				}
+				else if (level == highestLevel)
+				{
+					if (xp > highestXP)
+					{
+						highestSteamID = temp[0];
+						highestLevel = level;
+						highestXP = xp;
+					}
 				}
 			}
 

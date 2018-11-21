@@ -135,16 +135,14 @@ namespace PlayerXP
 
 		public static Player GetPlayer(string steamid)
 		{
-			Player pl = null;
 			foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 			{
 				if (player.SteamId == steamid)
 				{
-					pl = player;
-					break;
+					return player;
 				}
 			}
-			return pl;
+			return null;
 		}
 
 		public static void RemoveLvlZero()
