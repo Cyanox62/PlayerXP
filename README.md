@@ -17,8 +17,8 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 * Currently RA console only command (will be player console once that feature gets added) to check the level and xp of a user. You can use the users username with an autocomplete feature (plugin will automatically get the closest user to the name you typed) if they are on the server, otherwise you can use their steamid if they are offline
 * Command to find the player with the highest level in the server
 * Levels get increasingly harder to achieve, you need 1000 xp to get to level 2, then it will take 250 more experience to level up after every level
-* Players will get a message in their console when they have:
-  * Leveled up, including the xp required to level up again
+* Players will get a message in their console when they:
+  * Level up, including the xp required to level up again
   * Die, showing their current xp and the xp they need to level up
   * Complete a task, showing the amount of xp they gained and for what task
 * When a player is killed, the victim gets an output in their console saying the killers name and level
