@@ -48,7 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventHandler.cs" />
+    <Compile Include="LeaderboardCommand.cs" />
     <Compile Include="LevelCommand.cs" />
+    <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerXP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopLevelCommand.cs" />

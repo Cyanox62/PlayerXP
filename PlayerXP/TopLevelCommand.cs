@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using Smod2;
 using Smod2.Commands;
 using Smod2.API;
@@ -27,33 +27,9 @@ namespace PlayerXP
 
 		public string[] OnCall(ICommandSender sender, string[] args)
 		{
-			string[] lines = File.ReadAllLines(PlayerXP.XPDataPath);
-			string highestSteamID = "unknown";
-			int highestLevel = 0;
-			int highestXP = 0;
-			foreach (string steamid in lines)
-			{
-				string[] temp = steamid.Split(':');
-				int level = Int32.Parse(temp[1]);
-				int xp = Int32.Parse(temp[2]);
-				if (level > highestLevel)
-				{
-					highestSteamID = temp[0];
-					highestLevel = level;
-					highestXP = xp;
-				}
-				else if (level == highestLevel)
-				{
-					if (xp > highestXP)
-					{
-						highestSteamID = temp[0];
-						highestLevel = level;
-						highestXP = xp;
-					}
-				}
-			}
+			List<PlayerInfo> topPlayers = PlayerXP.GetLeaderBoard(1);		
 
-			Player player = PlayerXP.GetPlayer(highestSteamID);
+			Player player = PlayerXP.GetPlayer(topPlayers[0].pSteamID);
 			string name;
 
 			if (player != null)
@@ -61,7 +37,7 @@ namespace PlayerXP
 			else
 				name = "Unconnected";
 
-			return new string[] { "Player " + name + " (" + highestSteamID + ")", "Level: " + highestLevel.ToString(), "XP: " + highestXP.ToString() + "/" + PlayerXP.XpToLevelUp(highestSteamID) };
+			return new string[] { "Player " + name + " (" + topPlayers[0].pSteamID + ")", "Level: " + topPlayers[0].pLevel, "XP: " + topPlayers[0].pXP + "/" + PlayerXP.XpToLevelUp(topPlayers[0].pSteamID) };
 		}
 	}
 }

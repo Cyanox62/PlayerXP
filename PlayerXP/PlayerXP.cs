@@ -4,6 +4,7 @@ using Smod2;
 using Smod2.Attributes;
 using Smod2.API;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PlayerXP
 {
@@ -47,6 +48,7 @@ namespace PlayerXP
 			AddEventHandlers(new EventHandler(this));
 			this.AddCommands(new string[] { "lvl", "level" }, new LevelCommand(this));
 			this.AddCommands(new string[] { "toplvl", "toplevel" }, new TopLevelCommand(this));
+			this.AddCommands(new string[] { "leaderboard" }, new LeaderboardCommand(this));
 
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 1.0f, Smod2.Config.SettingType.FLOAT, true, ""));
 
@@ -232,6 +234,57 @@ namespace PlayerXP
 			}
 			playerOut = plyer;
 			return playerOut;
+		}
+
+		public static List<PlayerInfo> GetLeaderBoard(int num)
+		{
+			List<string> players = new List<string>(File.ReadAllLines(XPDataPath));
+			List<PlayerInfo> top = new List<PlayerInfo>();
+
+			for (int i = 0; i < num; i++)
+			{
+				if (players.Count > 0)
+				{
+					string highestPlayer = "unknown";
+					string highestSteamID = "unknown";
+					int highestLevel = 0;
+					int highestXP = 0;
+
+					foreach (string steamid in players)
+					{
+						string[] temp = steamid.Split(':');
+						int level = Int32.Parse(temp[1]);
+						int xp = Int32.Parse(temp[2]);
+						if (level > highestLevel)
+						{
+							highestPlayer = steamid;
+							highestSteamID = temp[0];
+							highestLevel = level;
+							highestXP = xp;
+						}
+						else if (level == highestLevel)
+						{
+							if (xp > highestXP)
+							{
+								highestPlayer = steamid;
+								highestSteamID = temp[0];
+								highestLevel = level;
+								highestXP = xp;
+							}
+						}
+					}
+					PlayerInfo info = new PlayerInfo()
+					{
+						pSteamID = highestSteamID,
+						pLevel = highestLevel.ToString(),
+						pXP = highestXP.ToString()
+					};
+
+					top.Add(info);
+					players.Remove(highestPlayer);
+				}
+			}
+			return top;
 		}
 	}
 }
