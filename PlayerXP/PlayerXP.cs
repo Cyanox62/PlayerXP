@@ -286,5 +286,19 @@ namespace PlayerXP
 			}
 			return top;
 		}
+
+		public static int GetPlayerPlace(string steamid)
+		{
+			List<PlayerInfo> players = GetLeaderBoard(File.ReadAllLines(XPDataPath).Length);
+
+			for (int i = 0; i < players.Count; i++)
+			{
+				if (steamid == players[i].pSteamID)
+				{
+					return i + 1;
+				}
+			}
+			return -1;
+		}
 	}
 }

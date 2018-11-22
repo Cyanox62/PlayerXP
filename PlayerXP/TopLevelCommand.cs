@@ -37,7 +37,7 @@ namespace PlayerXP
 			else
 				name = "Unconnected";
 
-			return new string[] { "Player " + name + " (" + topPlayers[0].pSteamID + ")", "Level: " + topPlayers[0].pLevel, "XP: " + topPlayers[0].pXP + "/" + PlayerXP.XpToLevelUp(topPlayers[0].pSteamID) };
+			return new string[] { "Player: " + name + " (" + topPlayers[0].pSteamID + ")", "Level: " + topPlayers[0].pLevel, "XP: " + topPlayers[0].pXP + "/" + PlayerXP.XpToLevelUp(topPlayers[0].pSteamID) };
 		}
 	}
 }
