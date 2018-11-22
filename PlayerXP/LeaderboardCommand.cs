@@ -37,22 +37,26 @@ namespace PlayerXP
 			}
 			List<PlayerInfo> topPlayers = PlayerXP.GetLeaderBoard(num);
 			List<string> output = new List<string>();
-			output.Add("Top " + num.ToString() + " Players:");
-
-			for (int i = 0; i < topPlayers.Count; i++)
+			if (topPlayers.Count > 0)
 			{
-				Player player = PlayerXP.GetPlayer(topPlayers[i].pSteamID);
-				string name;
+				output.Add("Top " + num.ToString() + " Players:");
 
-				if (player != null)
-					name = "\"" + player.Name + "\"";
-				else
-					name = "Unconnected";
+				for (int i = 0; i < topPlayers.Count; i++)
+				{
+					Player player = PlayerXP.GetPlayer(topPlayers[i].pSteamID);
+					string name;
 
-				output.Add((i + 1).ToString() + ") " + name + " (" + topPlayers[i].pSteamID + ") | " + "Level: " + topPlayers[i].pLevel + " | XP: " + topPlayers[i].pXP + " / " + PlayerXP.XpToLevelUp(topPlayers[i].pSteamID));
+					if (player != null)
+						name = "\"" + player.Name + "\"";
+					else
+						name = "Unconnected";
+
+					output.Add((i + 1).ToString() + ") " + name + " (" + topPlayers[i].pSteamID + ") | " + "Level: " + topPlayers[i].pLevel + " | XP: " + topPlayers[i].pXP + " / " + PlayerXP.XpToLevelUp(topPlayers[i].pSteamID));
+				}
+
+				return output.ToArray();
 			}
-
-			return output.ToArray();
+			return new string[] { "Error: there is not enough data to display the leaderboard." };
 		}
 	}
 }
