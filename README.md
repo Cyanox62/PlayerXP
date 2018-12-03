@@ -29,4 +29,4 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 | :-------------: | :---------: | :------ |
 | LVL / LEVEL | PLAYER NAME / STEAMID64 | Displays a user's level and xp. Will also display their server ranking. |
 | TOPLVL / TOPLEVEL | | Displays the user with the highest level and xp. |
-| LEADERBOARD | (NUMBER) | Displays the top users in the server. If no number is specified it will output the top 5. |
+| LEADERBOARD | NUMBER | Displays the top users in the server. If no number is specified it will output the top 5. |
