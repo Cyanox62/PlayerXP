@@ -54,4 +54,8 @@
 	{
 		public static int ZombieCreated = (int)(PlayerXP.plugin.GetConfigInt("xp_scp049_zombie_created") * PlayerXP.xpScale);
 	}
+	static class SCP079XP
+	{
+		public static int PlayerKilled = (int)(PlayerXP.plugin.GetConfigInt("xp_scp079_player_killed") * PlayerXP.xpScale);
+	}
 }

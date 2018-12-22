@@ -98,6 +98,9 @@ namespace PlayerXP
 			// SCP-049
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp049_zombie_created", 25, Smod2.Config.SettingType.NUMERIC, true, ""));
 
+			// SCP-079
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scp079_player_killed", 10, Smod2.Config.SettingType.NUMERIC, true, ""));
+
 		}
 
 		public static int GetLine(string steamid)

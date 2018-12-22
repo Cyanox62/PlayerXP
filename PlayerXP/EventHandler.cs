@@ -111,7 +111,7 @@ namespace PlayerXP
 			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CLASSD)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 					gainedXP = DClassXP.ScientistKill;
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = DClassXP.NineTailedFoxKill;
@@ -127,7 +127,7 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 			{
 				int gainedXP = 0;
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
@@ -168,7 +168,7 @@ namespace PlayerXP
 			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 					gainedXP = ChaosXP.ScientistKill;
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = ChaosXP.NineTailedFoxKill;
@@ -189,7 +189,7 @@ namespace PlayerXP
 				int gainedXP = 0;
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
 					gainedXP = TutorialXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 				    gainedXP = TutorialXP.ScientistKill;
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
 					gainedXP = TutorialXP.NineTailedFoxKill;
@@ -219,6 +219,18 @@ namespace PlayerXP
 						{
 							player.SendConsoleMessage("You have gained " + TutorialXP.SCPKillsPlayer.ToString() + "xp for an SCP killing an enemy!", "yellow");
 							AddXP(player.SteamId, TutorialXP.SCPKillsPlayer);
+						}
+					}
+				}
+
+				if (SCP079XP.PlayerKilled > 0 && ev.Player.SteamId != ev.Killer.SteamId && ev.Player.TeamRole.Team != Smod2.API.Team.TUTORIAL)
+				{
+					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+					{
+						if (player.TeamRole.Role == Role.SCP_079)
+						{
+							player.SendConsoleMessage("You have gained " + SCP079XP.PlayerKilled.ToString() + "xp for another SCP killing an enemy!", "yellow");
+							AddXP(player.SteamId, SCP079XP.PlayerKilled);
 						}
 					}
 				}
