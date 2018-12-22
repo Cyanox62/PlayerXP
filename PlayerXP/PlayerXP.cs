@@ -13,7 +13,7 @@ namespace PlayerXP
 	name = "Player XP",
 	description = "A plugin that lets players collect XP and level up.",
 	id = "cyan.playerxp",
-	version = "0.8",
+	version = "0.9",
 	SmodMajor = 3,
 	SmodMinor = 0,
 	SmodRevision = 0
