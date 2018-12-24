@@ -37,15 +37,22 @@ namespace PlayerXP
 			if (!Directory.Exists(XPPath))
 				Directory.CreateDirectory(XPPath);
 
-			if (!File.Exists(XPDataPath))
+			if (File.Exists(XPDataPath))
 			{
+				plugin.Info("Your data has not been ported over to the new system, porting now...");
+				string[] ids = File.ReadAllLines(PlayerXP.XPDataPath);
+
+				foreach (string str in ids)
+				{
+					string[] split = str.Split(':');
+					File.WriteAllText(XPPath + dirSeperator + split[0] + ".txt", split[1] + ":" + split[2]);
+				}
+				File.Delete(XPDataPath);
 				UpdateRankings();
-				RemoveLvlZero();
+				plugin.Info("Data successfully ported to the new system!");
 			}
-			else
-			{
-				plugin.Info("WARNING! You are still using the old XP system, this plugin will not function properly unless you port to the new system. When your server finishes starting up type 'xpport' and wait for it to finish to port to the new system.");
-			}
+			UpdateRankings();
+			RemoveLvlZero();
 		}
 
 		public override void Register()
