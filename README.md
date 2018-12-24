@@ -22,7 +22,7 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
   * Die, showing their current xp and the xp they need to level up
   * Complete a task, showing the amount of xp they gained and for what task
 * When a player is killed, the victim gets an output in their console saying the killers name and level
-* All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt`
+* All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP
 * Levels transfer between MultiAdmin servers
 
 | Command        | Value Type | Description |
