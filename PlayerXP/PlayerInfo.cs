@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 
 namespace PlayerXP
 {
-	public struct PlayerInfo
+	public class PlayerInfo
 	{
-		public string pSteamID;
-		public string pLevel;
-		public string pXP;
+		public int pLevel;
+		public int pXP;
+
+		public PlayerInfo(int level, int xp)
+		{
+			pLevel = level;
+			pXP = xp;
+		}
 	}
 }

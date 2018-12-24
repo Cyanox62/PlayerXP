@@ -22,8 +22,11 @@ namespace PlayerXP
 	{
 		public static Plugin plugin;
 		public static float xpScale;
+		public static string dirSeperator = Path.DirectorySeparatorChar.ToString();
 		public static string XPPath = FileManager.GetAppFolder() + "PlayerXP";
-		public static string XPDataPath = FileManager.GetAppFolder() + "PlayerXP/PlayerXPData.txt";
+		public static string XPDataPath = FileManager.GetAppFolder() + "PlayerXP" + dirSeperator + "PlayerXPData.txt";
+
+		public static Dictionary<string, PlayerInfo> pInfoDict = new Dictionary<string, PlayerInfo>();
 
 		public override void OnDisable() { }
 
@@ -35,11 +38,8 @@ namespace PlayerXP
 			{
 				Directory.CreateDirectory(XPPath);
 			}
-			if (!File.Exists(XPDataPath))
-			{
-				using (new StreamWriter(File.Create(XPDataPath))) { }
-			}
 
+			UpdateRankings();
 			RemoveLvlZero();
 		}
 
@@ -47,8 +47,9 @@ namespace PlayerXP
 		{
 			AddEventHandlers(new EventHandler(this));
 			this.AddCommands(new string[] { "lvl", "level" }, new LevelCommand(this));
-			this.AddCommands(new string[] { "toplvl", "toplevel" }, new TopLevelCommand(this));
 			this.AddCommands(new string[] { "leaderboard" }, new LeaderboardCommand(this));
+			this.AddCommand("xpport", new XPPortCommand(this));
+			this.AddCommand("xpupdate", new XPUpdateCommand(this));
 
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 1.0f, Smod2.Config.SettingType.FLOAT, true, ""));
 
@@ -103,37 +104,21 @@ namespace PlayerXP
 
 		}
 
-		public static int GetLine(string steamid)
-		{
-			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
-
-			int count = 0;
-			foreach (string sid in players)
-			{
-				if (sid.Split(':')[0] == steamid)
-					return count;
-				count++;
-			}
-			return -1;
-		}
-
 		public static int GetLevel(string steamid)
 		{
-			int lineNum = GetLine(steamid);
-			return Int32.Parse(File.ReadAllLines(PlayerXP.XPDataPath)[lineNum].Split(':')[1]);
+			return int.Parse(File.ReadAllText(XPPath + dirSeperator + steamid + ".txt").Split(':')[0]);
 		}
 
 		public static int GetXP(string steamid)
 		{
-			int lineNum = GetLine(steamid);
-			return Int32.Parse(File.ReadAllLines(PlayerXP.XPDataPath)[lineNum].Split(':')[2]);
+			return int.Parse(File.ReadAllText(XPPath + dirSeperator + steamid + ".txt").Split(':')[1]);
 		}
 
 		public static int XpToLevelUp(string steamid)
 		{
-			string line = File.ReadAllLines(XPDataPath)[GetLine(steamid)];
-			int lvl = Int32.Parse(line.Split(':')[1]);
-			int currXP = Int32.Parse(line.Split(':')[2]);
+			string[] data = File.ReadAllText(XPPath + dirSeperator + steamid + ".txt").Split(':');
+			int lvl = int.Parse(data[0]);
+			int currXP = int.Parse(data[1]);
 
 			return lvl * 250 + 750;
 		}
@@ -152,19 +137,16 @@ namespace PlayerXP
 
 		public static void RemoveLvlZero()
 		{
-			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
-			List<string> playerList = new List<string>(players);
-			foreach (string steamid in players)
+			string[] files = Directory.GetFiles(XPPath);
+			Dictionary<string, PlayerInfo> tempDict = new Dictionary<string, PlayerInfo>();
+			foreach (string file in files)
 			{
-				string sid = steamid.Split(':')[0];
-				if (GetLevel(sid) == 1 && GetXP(sid) == 0)
-				{
-					playerList.Remove(steamid);
-				}
+				string[] data = File.ReadAllText(file).Split(':');
+				int level = int.Parse(data[0]);
+				int currXP = int.Parse(data[1]);
+				if (level == 1 && currXP == 0)
+					File.Delete(file);
 			}
-
-			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
-			File.WriteAllLines(PlayerXP.XPDataPath, playerList.ToArray());
 		}
 
 		public static int LevenshteinDistance(string s, string t)
@@ -239,69 +221,42 @@ namespace PlayerXP
 			return playerOut;
 		}
 
-		public static List<PlayerInfo> GetLeaderBoard(int num)
+		public static Dictionary<string, PlayerInfo> GetLeaderBoard(int num)
 		{
-			List<string> players = new List<string>(File.ReadAllLines(XPDataPath));
-			List<PlayerInfo> top = new List<PlayerInfo>();
-
-			for (int i = 0; i < num; i++)
-			{
-				if (players.Count > 0)
-				{
-					string highestPlayer = "unknown";
-					string highestSteamID = "unknown";
-					int highestLevel = 0;
-					int highestXP = 0;
-
-					foreach (string steamid in players)
-					{
-						string[] temp = steamid.Split(':');
-						int level = Int32.Parse(temp[1]);
-						int xp = Int32.Parse(temp[2]);
-						if (level > highestLevel)
-						{
-							highestPlayer = steamid;
-							highestSteamID = temp[0];
-							highestLevel = level;
-							highestXP = xp;
-						}
-						else if (level == highestLevel)
-						{
-							if (xp > highestXP)
-							{
-								highestPlayer = steamid;
-								highestSteamID = temp[0];
-								highestLevel = level;
-								highestXP = xp;
-							}
-						}
-					}
-					PlayerInfo info = new PlayerInfo()
-					{
-						pSteamID = highestSteamID,
-						pLevel = highestLevel.ToString(),
-						pXP = highestXP.ToString()
-					};
-
-					top.Add(info);
-					players.Remove(highestPlayer);
-				}
-			}
-			return top;
+			return pInfoDict.Take(num).ToDictionary(x => x.Key, x => x.Value);
 		}
 
 		public static int GetPlayerPlace(string steamid)
 		{
-			List<PlayerInfo> players = GetLeaderBoard(File.ReadAllLines(XPDataPath).Length);
+			return pInfoDict.Keys.ToList().IndexOf(steamid) + 1;
+		}
 
-			for (int i = 0; i < players.Count; i++)
+		public static string[] StringToStringArray(string input)
+		{
+			List<string> data = new List<string>();
+			if (input.Length > 0)
 			{
-				if (steamid == players[i].pSteamID)
+				string[] a = input.Split(' ');
+				for (int i = 0; i < a.Count(); i++)
 				{
-					return i + 1;
+					data.Add(a[i]);
 				}
 			}
-			return -1;
+			return data.ToArray();
+		}
+
+		public static void UpdateRankings()
+		{
+			string[] files = Directory.GetFiles(XPPath);
+			Dictionary<string, PlayerInfo> tempDict = new Dictionary<string, PlayerInfo>();
+			foreach (string file in files)
+			{
+				string[] data = File.ReadAllText(file).Split(':');
+				int level = int.Parse(data[0]);
+				int currXP = int.Parse(data[1]);
+				tempDict.Add(file.Replace(XPPath + dirSeperator, "").Replace(".txt", ""), new PlayerInfo(level, currXP));
+			}
+			pInfoDict = tempDict.OrderByDescending(x => x.Value.pLevel).ThenByDescending(x => x.Value.pXP).ToDictionary(x => x.Key, x => x.Value);
 		}
 	}
 }

@@ -7,7 +7,7 @@ using Smod2.Events;
 
 namespace PlayerXP
 {
-	class EventHandler : IEventHandlerPlayerJoin, IEventHandlerPlayerDie, IEventHandlerRoundEnd, IEventHandlerRoundStart,  IEventHandlerCheckEscape, IEventHandlerRecallZombie, IEventHandlerPocketDimensionDie
+	class EventHandler : IEventHandlerPlayerJoin, IEventHandlerCallCommand, IEventHandlerPlayerDie, IEventHandlerRoundEnd, IEventHandlerRoundStart,  IEventHandlerCheckEscape, IEventHandlerRecallZombie, IEventHandlerPocketDimensionDie
 	{
 		private Plugin plugin;
 		private bool roundStarted = false;
@@ -15,20 +15,6 @@ namespace PlayerXP
 		public EventHandler(Plugin plugin)
 		{
 			this.plugin = plugin;
-		}
-
-		private bool IsPlayerInData(Player player)
-		{
-			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
-
-			foreach (string steamid in players)
-			{
-				if (player.SteamId == steamid.Split(':')[0])
-				{
-					return true;
-				}
-			}
-			return false;
 		}
 
 		private Player FindPlayer(string steamid)
@@ -41,10 +27,9 @@ namespace PlayerXP
 
 		private void AddXP(string steamid, int xp)
 		{
-			int lineNum = PlayerXP.GetLine(steamid);
-			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
-			int level = Int32.Parse(players[lineNum].Split(':')[1]);
-			int currXP = Int32.Parse(players[lineNum].Split(':')[2]);
+			string[] data = File.ReadAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt").Split(':');
+			int level = int.Parse(data[0]);
+			int currXP = int.Parse(data[1]);
 
 			currXP += xp;
 			if (currXP >= level * 250 + 750)
@@ -53,18 +38,14 @@ namespace PlayerXP
 				level++;
 				FindPlayer(steamid).SendConsoleMessage("You've leveled up to level " + level.ToString() + "!" + " You need " + ((level * 250 + 750) - currXP).ToString() + "xp for your next level.", "yellow");
 			}
-			players[lineNum] = players[lineNum].Split(':')[0] + ":" + level.ToString() + ":" + currXP.ToString();
-
-			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
-			File.WriteAllLines(PlayerXP.XPDataPath, players);
+			File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt", level + ":" + currXP);
 		}
 
 		private void RemoveXP(string steamid, int xp)
 		{
-			int lineNum = PlayerXP.GetLine(steamid);
-			string[] players = File.ReadAllLines(PlayerXP.XPDataPath);
-			int level = Int32.Parse(players[lineNum].Split(':')[1]);
-			int currXP = Int32.Parse(players[lineNum].Split(':')[2]);
+			string[] data = File.ReadAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt").Split(':');
+			int level = int.Parse(data[0]);
+			int currXP = int.Parse(data[1]);
 
 			currXP -= xp;
 			if (currXP <= 0)
@@ -79,24 +60,66 @@ namespace PlayerXP
 					currXP = 0;
 				}
 			}
+			File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt", level + ":" + currXP);
+		}
 
-			players[lineNum] = players[lineNum].Split(':')[0] + ":" + level.ToString() + ":" + currXP.ToString();
+		public void OnCallCommand(PlayerCallCommandEvent ev)
+		{
+			if (ev.Command.ToLower().StartsWith("level") || ev.Command.ToLower().StartsWith("lvl"))
+			{
+				string msg = "\n";
+				string[] a = new LevelCommand(plugin).OnCall(ev.Player, PlayerXP.StringToStringArray(ev.Command.Replace(ev.Command.ToLower().StartsWith("level") ? "level " : "lvl ", "")));
+				for (int i = 0; i < a.Length; i++)
+				{
+					msg += a[i];
+					if (i != a.Length - 1)
+						msg += Environment.NewLine;
+				}
+				ev.ReturnMessage = msg;
+			}
 
-			File.WriteAllText(PlayerXP.XPDataPath, String.Empty);
-			File.WriteAllLines(PlayerXP.XPDataPath, players);
+			if (ev.Command.ToLower().StartsWith("leaderboard"))
+			{
+				string msg = "\n";
+				string[] a = new LeaderboardCommand(plugin).OnCall(ev.Player, PlayerXP.StringToStringArray(ev.Command.Replace("leaderboard ", "")));
+				for (int i = 0; i < a.Length; i++)
+				{
+					msg += a[i];
+					if (i != a.Length - 1)
+						msg += Environment.NewLine;
+				}
+				ev.ReturnMessage = msg;
+			}
 		}
 
 		public void OnRoundStart(RoundStartEvent ev)
 		{
 			roundStarted = true;
 			PlayerXP.xpScale = plugin.GetConfigFloat("xp_scale");
+			PlayerXP.UpdateRankings();
+		}
+
+		public void OnRoundEnd(RoundEndEvent ev)
+		{
+			if (AllXP.RoundWinXP > 0)
+			{
+				foreach (Player player in plugin.Server.GetPlayers())
+				{
+					if (player.TeamRole.Team != Smod2.API.Team.SPECTATOR && player.TeamRole.Team != Smod2.API.Team.NONE && roundStarted)
+					{
+						player.SendConsoleMessage("You have gained " + AllXP.RoundWinXP.ToString() + "xp for winning the round!", "yellow");
+						AddXP(player.SteamId, AllXP.RoundWinXP);
+					}
+				}
+			}
+			roundStarted = false;
 		}
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
 		{
-			if (!IsPlayerInData(ev.Player))
+			if (!File.Exists(PlayerXP.XPPath + PlayerXP.dirSeperator + ev.Player.SteamId + ".txt"))
 			{
-				File.AppendAllText(PlayerXP.XPDataPath, ev.Player.SteamId + ":1:0" + Environment.NewLine);
+				File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + ev.Player.SteamId + ".txt", "1:0");
 			}
 		}
 
@@ -239,7 +262,7 @@ namespace PlayerXP
 			if (ev.Player.Name != ev.Killer.Name && ev.Killer != null && ev.Killer.SteamId != string.Empty)
 				ev.Player.SendConsoleMessage("You were killed by " + ev.Killer.Name + ", level " + PlayerXP.GetLevel(ev.Killer.SteamId).ToString() + ".", "yellow");
 			if (ev.Player != null && ev.Player.SteamId != string.Empty)
-				ev.Player.SendConsoleMessage("You have " + PlayerXP.GetXP(ev.Player.SteamId) + "/" + PlayerXP.XpToLevelUp(ev.Player.SteamId) + "xp until you reach level " + (PlayerXP.GetLevel(ev.Player.SteamId) + 1).ToString() + ".", "yellow");
+				ev.Player.SendConsoleMessage("You have " + PlayerXP.GetXP(ev.Player.SteamId) + PlayerXP.dirSeperator + PlayerXP.XpToLevelUp(ev.Player.SteamId) + "xp until you reach level " + (PlayerXP.GetLevel(ev.Player.SteamId) + 1).ToString() + ".", "yellow");
 		}
 
 		public void OnPocketDimensionDie(PlayerPocketDimensionDieEvent ev)
@@ -248,7 +271,7 @@ namespace PlayerXP
 			{
 				foreach (Player player in plugin.pluginManager.Server.GetPlayers())
 				{
-					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player != null && ev.Player != null)
+					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player != null && ev.Player != null && this != null)
 					{
 						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
 						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " 
@@ -311,22 +334,6 @@ namespace PlayerXP
 					}
 				}
 			}
-		}
-
-		public void OnRoundEnd(RoundEndEvent ev)
-		{
-			if (AllXP.RoundWinXP > 0)
-			{
-				foreach (Player player in plugin.Server.GetPlayers())
-				{
-					if (player.TeamRole.Team != Smod2.API.Team.SPECTATOR && player.TeamRole.Team != Smod2.API.Team.NONE && roundStarted)
-					{
-						player.SendConsoleMessage("You have gained " + AllXP.RoundWinXP.ToString() + "xp for winning the round!", "yellow");
-						AddXP(player.SteamId, AllXP.RoundWinXP);
-					}
-				}
-			}
-			roundStarted = false;
 		}
 	}
 }

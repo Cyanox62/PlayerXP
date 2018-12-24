@@ -52,8 +52,7 @@ namespace PlayerXP
 					else
 						name = "Unconnected";
 
-
-					return new string[] { "Player: " + name + " (" + steamid + ")", "Level: " + PlayerXP.GetLevel(steamid), "XP: " + PlayerXP.GetXP(steamid) + "/" + PlayerXP.XpToLevelUp(steamid), "Server ranking: " + PlayerXP.GetPlayerPlace(steamid).ToString() };
+					return new string[] { "Player: " + name + " (" + steamid + ")", "Level: " + PlayerXP.GetLevel(steamid), "XP: " + PlayerXP.GetXP(steamid) + " / " + PlayerXP.XpToLevelUp(steamid), "Server ranking: " + PlayerXP.GetPlayerPlace(steamid).ToString() };
 				}
 			}
 			return new string[] { GetUsage() };

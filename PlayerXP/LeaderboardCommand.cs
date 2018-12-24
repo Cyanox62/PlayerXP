@@ -30,20 +30,21 @@ namespace PlayerXP
 			int num = 5;
 			if (args.Length > 0)
 			{
-				if (Int32.TryParse(args[0], out int a))
+				if (int.TryParse(args[0], out int a))
 				{
 					num = a;
 				}
 			}
-			List<PlayerInfo> topPlayers = PlayerXP.GetLeaderBoard(num);
+			Dictionary<string, PlayerInfo> dict = PlayerXP.GetLeaderBoard(num);
 			List<string> output = new List<string>();
-			if (topPlayers.Count > 0)
+			int count = 1;
+			if (dict.Count > 0)
 			{
 				output.Add("Top " + num.ToString() + " Players:");
 
-				for (int i = 0; i < topPlayers.Count; i++)
+				foreach (KeyValuePair<string, PlayerInfo> info in dict)
 				{
-					Player player = PlayerXP.GetPlayer(topPlayers[i].pSteamID);
+					Player player = PlayerXP.GetPlayer(info.Key);
 					string name;
 
 					if (player != null)
@@ -51,7 +52,8 @@ namespace PlayerXP
 					else
 						name = "Unconnected";
 
-					output.Add((i + 1).ToString() + ") " + name + " (" + topPlayers[i].pSteamID + ") | " + "Level: " + topPlayers[i].pLevel + " | XP: " + topPlayers[i].pXP + " / " + PlayerXP.XpToLevelUp(topPlayers[i].pSteamID));
+					output.Add(count.ToString() + ") " + name + " (" + info.Key + ") | " + "Level: " + info.Value.pLevel + " | XP: " + info.Value.pXP + " / " + PlayerXP.XpToLevelUp(info.Key));
+					count++;
 				}
 
 				return output.ToArray();
