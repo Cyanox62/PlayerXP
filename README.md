@@ -25,7 +25,7 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 * All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP
 * Levels transfer between MultiAdmin servers
 
-**Commands that can be run from both RA console and player console.**
+**Commands that can be run from both RA console and player console. These commands must use the prefix `.` if they are being run through the player console.**
 
 | Command        | Value Type | Description |
 | :-------------: | :---------: | :------ |
