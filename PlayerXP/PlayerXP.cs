@@ -35,12 +35,17 @@ namespace PlayerXP
 			plugin = this;
 
 			if (!Directory.Exists(XPPath))
-			{
 				Directory.CreateDirectory(XPPath);
-			}
 
-			UpdateRankings();
-			RemoveLvlZero();
+			if (!File.Exists(XPDataPath))
+			{
+				UpdateRankings();
+				RemoveLvlZero();
+			}
+			else
+			{
+				plugin.Info("WARNING! You are still using the old XP system, this plugin will not function properly unless you port to the new system. When your server finishes starting up type 'xpport' and wait for it to finish to port to the new system.");
+			}
 		}
 
 		public override void Register()
