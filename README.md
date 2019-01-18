@@ -14,19 +14,26 @@ Place the "PlayerXP.dll" file in your sm_plugins folder.
 * Gives xp values based on normal game tasks
 * Scale factor for all xp values
 * Config options to change the rates of each task
-* Currently RA console only command (will be player console once that feature gets added) to check the level and xp of a user. You can use the users username with an autocomplete feature (plugin will automatically get the closest user to the name you typed) if they are on the server, otherwise you can use their steamid if they are offline
+* Commands that can be run through RA console **or** client console by using the prefix `.` to check the level, xp, and server ranking of a user, as well as the server leaderboard. You can use the users username with an autocomplete feature (plugin will automatically get the closest user to the name you typed) if they are on the server, otherwise you can use their steamid if they are offline
 * Commands to find the player with the highest level in the server and get the server's leaderboard
-* Levels get increasingly harder to achieve, you need 1000 xp to get to level 2, then it will take 250 more experience to level up after every level
+* Levels get increasingly harder to achieve, you need 1000 xp to get to level 2, then it will take 250 more xp to level up after every level
 * Players will get a message in their console when they:
   * Level up, including the xp required to level up again
   * Die, showing their current xp and the xp they need to level up
   * Complete a task, showing the amount of xp they gained and for what task
 * When a player is killed, the victim gets an output in their console saying the killers name and level
-* All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP/PlayerXPData.txt`
+* All data is saved in `%appdata%/SCP Secret Laboratory/PlayerXP
 * Levels transfer between MultiAdmin servers
+
+**Commands that can be run from both RA console and player console. These commands must use the prefix `.` if they are being run through the player console.**
 
 | Command        | Value Type | Description |
 | :-------------: | :---------: | :------ |
 | LVL / LEVEL | PLAYER NAME / STEAMID64 | Displays a user's level and xp. Will also display their server ranking. |
-| TOPLVL / TOPLEVEL | | Displays the user with the highest level and xp. |
 | LEADERBOARD | NUMBER | Displays the top users in the server. If no number is specified it will output the top 5. |
+
+**Commands that can only be run through RA console.**
+
+| Command        | Value Type | Description |
+| :-------------: | :---------: | :------ |
+| XPUPDATE | | Updates server rankings manually. |
