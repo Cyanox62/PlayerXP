@@ -40,7 +40,7 @@ namespace PlayerXP
 			if (File.Exists(XPDataPath))
 			{
 				plugin.Info("Your data has not been ported over to the new system, porting now...");
-				string[] ids = File.ReadAllLines(PlayerXP.XPDataPath);
+				string[] ids = File.ReadAllLines(XPDataPath);
 
 				foreach (string str in ids)
 				{
@@ -154,8 +154,17 @@ namespace PlayerXP
 			foreach (string file in files)
 			{
 				string[] data = File.ReadAllText(file).Split(':');
-				int level = int.Parse(data[0]);
-				int currXP = int.Parse(data[1]);
+				int level = 0;
+				int currXP = 0;
+				if (int.TryParse(data[0], out int a) && int.TryParse(data[1], out int b))
+				{
+					level = a;
+					currXP = b;
+				}
+				else
+				{
+					plugin.Info($"Error parsing data in file {file}");
+				}
 				if (level == 1 && currXP == 0)
 					File.Delete(file);
 			}
@@ -264,8 +273,17 @@ namespace PlayerXP
 			foreach (string file in files)
 			{
 				string[] data = File.ReadAllText(file).Split(':');
-				int level = int.Parse(data[0]);
-				int currXP = int.Parse(data[1]);
+				int level = 0;
+				int currXP = 0;
+				if (int.TryParse(data[0], out int a) && int.TryParse(data[1], out int b))
+				{
+					level = a;
+					currXP = b;
+				}
+				else
+				{
+					plugin.Info($"Error parsing data in file {file}");
+				}
 				tempDict.Add(file.Replace(XPPath + dirSeperator, "").Replace(".txt", ""), new PlayerInfo(level, currXP));
 			}
 			pInfoDict = tempDict.OrderByDescending(x => x.Value.pLevel).ThenByDescending(x => x.Value.pXP).ToDictionary(x => x.Key, x => x.Value);
