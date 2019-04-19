@@ -1,5 +1,7 @@
 # PlayerXP
 
+**I am no longer supporting this project, if you would like to contribute feel free to send a PR.**
+
 A plugin that adds a leveling system to your server. Users start at level 1, and gain experience through doing tasks such as escaping as a classd or scientist, winning the round, killing an SCP, etc.
 
 Click [here](https://github.com/Cyanox62/PlayerXP/wiki/XP-Config-Settings) for a full list of config settings/rates of xp.
