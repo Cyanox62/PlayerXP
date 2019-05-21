@@ -22,6 +22,7 @@ namespace PlayerXP
 	{
 		public static Plugin plugin;
 		public static float xpScale;
+		public static bool isToggled = true;
 		public static string dirSeperator = Path.DirectorySeparatorChar.ToString();
 		public static string XPPath = FileManager.GetAppFolder() + "PlayerXP";
 		public static string XPDataPath = FileManager.GetAppFolder() + "PlayerXP" + dirSeperator + "PlayerXPData.txt";
@@ -62,8 +63,10 @@ namespace PlayerXP
 			this.AddCommands(new string[] { "leaderboard" }, new LeaderboardCommand(this));
 			this.AddCommand("xpport", new XPPortCommand(this));
 			this.AddCommand("xpupdate", new XPUpdateCommand(this));
+			this.AddCommand("xptoggle", new XPToggleCommand(this));
 
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_scale", 1.0f, Smod2.Config.SettingType.FLOAT, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("xp_delete_unparsable", false, Smod2.Config.SettingType.BOOL, true, ""));
 
 			// All
 			this.AddConfig(new Smod2.Config.ConfigSetting("xp_all_round_win", 200, Smod2.Config.SettingType.NUMERIC, true, ""));
@@ -160,13 +163,15 @@ namespace PlayerXP
 				{
 					level = a;
 					currXP = b;
+
+					if (level == 1 && currXP == 0)
+						File.Delete(file);
 				}
 				else
 				{
 					plugin.Info($"Error parsing data in file {file}");
+					if (plugin.GetConfigBool("xp_delete_unparsable")) File.Delete(file);
 				}
-				if (level == 1 && currXP == 0)
-					File.Delete(file);
 			}
 		}
 
@@ -279,12 +284,13 @@ namespace PlayerXP
 				{
 					level = a;
 					currXP = b;
+					tempDict.Add(file.Replace(XPPath + dirSeperator, "").Replace(".txt", ""), new PlayerInfo(level, currXP));
 				}
 				else
 				{
 					plugin.Info($"Error parsing data in file {file}");
+					if (plugin.GetConfigBool("xp_delete_unparsable")) File.Delete(file);
 				}
-				tempDict.Add(file.Replace(XPPath + dirSeperator, "").Replace(".txt", ""), new PlayerInfo(level, currXP));
 			}
 			pInfoDict = tempDict.OrderByDescending(x => x.Value.pLevel).ThenByDescending(x => x.Value.pXP).ToDictionary(x => x.Key, x => x.Value);
 		}
