@@ -32,7 +32,14 @@ namespace PlayerXP
 			{
 				if (int.TryParse(args[0], out int a))
 				{
-					num = a;
+					if (a > 20)
+					{
+						num = 20;
+					}
+					else
+					{
+						num = a;
+					}
 				}
 			}
 			Dictionary<string, PlayerInfo> dict = PlayerXP.GetLeaderBoard(num);
