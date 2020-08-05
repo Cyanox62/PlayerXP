@@ -2,13 +2,15 @@
 {
 	public class PlayerInfo
 	{
-		public int pLevel;
-		public int pXP;
+		public string name;
+		public int level;
+		public int xp;
 
-		public PlayerInfo(int level, int xp)
+		public PlayerInfo(string name)
 		{
-			pLevel = level;
-			pXP = xp;
+			this.name = name;
+			level = 1;
+			xp = 0;
 		}
 	}
 }

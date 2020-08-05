@@ -1,335 +1,296 @@
-﻿using System;
+﻿using Exiled.Events.EventArgs;
+using Exiled.API.Features;
+using System.Collections.Generic;
+using System.Linq;
 using System.IO;
-using Smod2;
-using Smod2.API;
-using Smod2.EventHandlers;
-using Smod2.Events;
 
 namespace PlayerXP
 {
-	class EventHandler : IEventHandlerPlayerJoin, IEventHandlerCallCommand, IEventHandlerPlayerDie, IEventHandlerRoundEnd, IEventHandlerRoundStart,  IEventHandlerCheckEscape, IEventHandlerRecallZombie, IEventHandlerPocketDimensionDie
+	partial class EventHandler
 	{
-		private Plugin plugin;
-		private bool roundStarted = false;
+		public static Dictionary<string, PlayerInfo> pInfoDict = new Dictionary<string, PlayerInfo>();
+		public static Dictionary<string, PlayerInfo> pLeaderboard = new Dictionary<string, PlayerInfo>();
 
-		public EventHandler(Plugin plugin)
+		private bool isRoundStarted = false;
+		private bool isToggled = true;
+
+		public void OnConsoleCommand(SendingConsoleCommandEventArgs ev)
 		{
-			this.plugin = plugin;
-		}
-
-		private Player FindPlayer(string steamid)
-		{
-			foreach (Player player in plugin.pluginManager.Server.GetPlayers())
-				if (player.SteamId == steamid)
-					return player;
-			return null;
-		}
-
-		private void AddXP(string steamid, int xp)
-		{
-			string[] data = File.ReadAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt").Split(':');
-			int level = int.Parse(data[0]);
-			int currXP = int.Parse(data[1]);
-
-			currXP += xp;
-			if (currXP >= level * 250 + 750)
+			string cmd = ev.Name.ToLower();
+			if (cmd == "level" || cmd == "lvl")
 			{
-				currXP -= level * 250 + 750;
-				level++;
-				FindPlayer(steamid).SendConsoleMessage("You've leveled up to level " + level.ToString() + "!" + " You need " + ((level * 250 + 750) - currXP).ToString() + "xp for your next level.", "yellow");
+				Player player = ev.Arguments.Count == 0 ? ev.Player : Player.Get(ev.Arguments[0]);
+				string name;
+				bool hasData = pInfoDict.ContainsKey(player.UserId);
+				if (player != null) name = player.Nickname;
+				else name = hasData ? pInfoDict[ev.Player.UserId].level.ToString() : "[NO DATA]";
+				ev.ReturnMessage =
+					$"Player: {name} ({player.UserId})\n" +
+					$"Level: {(hasData ? pInfoDict[player.UserId].level.ToString() : "[NO DATA]")}\n" +
+					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}";
 			}
-			File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt", level + ":" + currXP);
-		}
-
-		private void RemoveXP(string steamid, int xp)
-		{
-			string[] data = File.ReadAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt").Split(':');
-			int level = int.Parse(data[0]);
-			int currXP = int.Parse(data[1]);
-
-			currXP -= xp;
-			if (currXP <= 0)
+			else if (cmd == "leaderboard" || cmd == "lb")
 			{
-				if (level > 1)
+				string output;
+				int num = 5;
+				if (ev.Arguments.Count > 0 && int.TryParse(ev.Arguments[0], out int n)) num = n;
+				if (num > 15)
 				{
-					level--;
-					currXP = (level * 250 + 750) - Math.Abs(currXP);
+					ev.Color = "red";
+					ev.ReturnMessage = "Leaderboards can be no larger than 15.";
+					return;
+				}
+				if (pInfoDict.Count != 0)
+				{
+					output = $"Top {num} Players:\n";
+
+					for (int i = 0; i < num; i++)
+					{
+						if (pInfoDict.Count == i) break;
+						string userid = pInfoDict.ElementAt(i).Key;
+						PlayerInfo info = pInfoDict[userid];
+						output += $"{i + 1}) {info.name} ({userid}) | Level: {info.level} | XP: {info.xp} / {XpToLevelUp(userid)}";
+						if (i != pInfoDict.Count - 1) output += "\n";
+						else break;
+					}
+
+					ev.Color = "yellow";
+					ev.ReturnMessage = output;
 				}
 				else
 				{
-					currXP = 0;
+					ev.Color = "red";
+					ev.ReturnMessage = "Error: there is not enough data to display the leaderboard.";
 				}
-			}
-			File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + steamid + ".txt", level + ":" + currXP);
-		}
-
-		public void OnCallCommand(PlayerCallCommandEvent ev)
-		{
-			if (ev.Command.ToLower().StartsWith("level") || ev.Command.ToLower().StartsWith("lvl"))
-			{
-				string msg = "\n";
-				string[] a = new LevelCommand(plugin).OnCall(ev.Player, PlayerXP.StringToStringArray(ev.Command.Replace(ev.Command.ToLower().StartsWith("level") ? "level " : "lvl ", "")));
-				for (int i = 0; i < a.Length; i++)
-				{
-					msg += a[i];
-					if (i != a.Length - 1)
-						msg += Environment.NewLine;
-				}
-				ev.ReturnMessage = msg;
-			}
-
-			if (ev.Command.ToLower().StartsWith("leaderboard"))
-			{
-				string msg = "\n";
-				string[] a = new LeaderboardCommand(plugin).OnCall(ev.Player, PlayerXP.StringToStringArray(ev.Command.Replace("leaderboard ", "")));
-				for (int i = 0; i < a.Length; i++)
-				{
-					msg += a[i];
-					if (i != a.Length - 1)
-						msg += Environment.NewLine;
-				}
-				ev.ReturnMessage = msg;
 			}
 		}
 
-		public void OnRoundStart(RoundStartEvent ev)
+		public void OnRAConsoleCommand(SendingRemoteAdminCommandEventArgs ev)
 		{
-			roundStarted = true;
-			PlayerXP.xpScale = plugin.GetConfigFloat("xp_scale");
-			PlayerXP.UpdateRankings();
+			string cmd = ev.Name.ToLower();
+			if (cmd == "xptoggle") isToggled = false;
+			else if (cmd == "xpsave") SaveStats();
 		}
 
-		public void OnRoundEnd(RoundEndEvent ev)
+		public void OnPlayerJoin(JoinedEventArgs ev)
 		{
-			if (AllXP.RoundWinXP > 0)
+			if (!File.Exists(Path.Combine(PlayerXP.XPPath, $"{ev.Player.UserId}.json"))) pInfoDict.Add(ev.Player.UserId, new PlayerInfo(ev.Player.Nickname));
+		}
+
+		public void OnWaitingForPlayers()
+		{
+			UpdateCache();
+		}
+
+		public void OnRoundStart() => isRoundStarted = true;
+
+		public void OnRoundEnd(RoundEndedEventArgs ev)
+		{
+			if (isToggled && PlayerXP.instance.Config.RoundWin > 0)
 			{
-				foreach (Player player in plugin.Server.GetPlayers())
+				foreach (Player player in Player.List)
 				{
-					if (player.TeamRole.Team != Smod2.API.Team.SPECTATOR && player.TeamRole.Team != Smod2.API.Team.NONE && roundStarted)
+					if (player.Team != Team.RIP && isRoundStarted)
 					{
-						player.SendConsoleMessage("You have gained " + AllXP.RoundWinXP.ToString() + "xp for winning the round!", "yellow");
-						AddXP(player.SteamId, AllXP.RoundWinXP);
+						AddXP(player.UserId, PlayerXP.instance.Config.RoundWin);
+						//AddXP(player.UserId, PlayerXP.instance.Config.RoundWin, $"You have gained {PlayerXP.instance.Config.RoundWin} xp for winning the round!");
 					}
 				}
 			}
-			roundStarted = false;
+			isRoundStarted = false;
+			SaveStats();
+			pInfoDict.Clear();
 		}
 
-		public void OnPlayerJoin(PlayerJoinEvent ev)
+		public void OnRoundRestart()
 		{
-			if (!File.Exists(PlayerXP.XPPath + PlayerXP.dirSeperator + ev.Player.SteamId + ".txt"))
+			// In case of force restart
+			if (pInfoDict.Count > 0)
 			{
-				File.WriteAllText(PlayerXP.XPPath + PlayerXP.dirSeperator + ev.Player.SteamId + ".txt", "1:0");
+				SaveStats();
+				pInfoDict.Clear();
 			}
 		}
 
-		public void OnPlayerDie(PlayerDeathEvent ev)
+		public void OnPlayerDying(DyingEventArgs ev)
 		{
-			if (ev.Killer.TeamRole.Team == ev.Player.TeamRole.Team && ev.Killer.SteamId != ev.Player.SteamId && roundStarted && AllXP.TeamKillPunishment > 0)
+			if (!isToggled) return;
+
+			if (ev.Killer.Team == ev.Target.Team && ev.Killer.UserId != ev.Target.UserId && isRoundStarted && PlayerXP.instance.Config.TeamKillPunishment > 0)
 			{
-				ev.Killer.SendConsoleMessage("You have lost " + AllXP.TeamKillPunishment.ToString() + "xp for teamkilling " + ev.Player.Name + ".", "yellow");
-				RemoveXP(ev.Killer.SteamId, AllXP.TeamKillPunishment);
+				RemoveXP(ev.Killer.UserId, PlayerXP.instance.Config.TeamKillPunishment, PlayerXP.instance.Config.PlayerTeamkillMessage.Replace("{xp}", PlayerXP.instance.Config.TeamKillPunishment.ToString()).Replace("{target}", ev.Target.Nickname));
 			}
 
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CLASSD)
+			if (ev.Killer.Team == Team.CDP)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
-					gainedXP = DClassXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
-					gainedXP = DClassXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-					gainedXP = DClassXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
-					gainedXP = DClassXP.TutorialKill;
+				if (ev.Target.Team == Team.RSC) gainedXP = PlayerXP.instance.Config.DclassScientistKill;
+				if (ev.Target.Team == Team.MTF) gainedXP = PlayerXP.instance.Config.DclassMtfKill;
+				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.DclassScpKill;
+				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.DclassTutorialKill;
 
-				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, gainedXP);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
-
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCIENTIST)
+			else if (ev.Killer.Team == Team.RSC)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
-					gainedXP = ScientistXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
-					gainedXP = ScientistXP.ChaosKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-					gainedXP = ScientistXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
-					gainedXP = ScientistXP.TutorialKill;
+				if (ev.Target.Team == Team.CDP) gainedXP = PlayerXP.instance.Config.ScientistDclassKill;
+				if (ev.Target.Team == Team.CHI) gainedXP = PlayerXP.instance.Config.ScientistChaosKill;
+				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.ScientistScpKill;
+				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.ScientistTutorialKill;
 
-				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, gainedXP);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
-
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
+			else if (ev.Killer.Team == Team.MTF)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
-					gainedXP = NineTailedFoxXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
-					gainedXP = NineTailedFoxXP.ChaosKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-					gainedXP = NineTailedFoxXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
-					gainedXP = NineTailedFoxXP.TutorialKill;
+				if (ev.Target.Team == Team.CDP) gainedXP = PlayerXP.instance.Config.MtfDclassKill;
+				if (ev.Target.Team == Team.CHI) gainedXP = PlayerXP.instance.Config.MtfChaosKill;
+				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.MtfScpKill;
+				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.MtfTutorialKill;
 
-				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, gainedXP);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
-
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
+			else if (ev.Killer.Team == Team.CHI)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
-					gainedXP = ChaosXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
-					gainedXP = ChaosXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-					gainedXP = ChaosXP.SCPKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
-					gainedXP = ChaosXP.TutorialKill;
+				if (ev.Target.Team == Team.RSC) gainedXP = PlayerXP.instance.Config.ChaosScientistKill;
+				if (ev.Target.Team == Team.MTF) gainedXP = PlayerXP.instance.Config.ChaosMtfKill;
+				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.ChaosScpKill;
+				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.ChaosTutorialKill;
 
-				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, gainedXP);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
-
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.TUTORIAL)
+			else if (ev.Killer.Team == Team.TUT)
 			{
 				int gainedXP = 0;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CLASSD)
-					gainedXP = TutorialXP.DClassKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
-				    gainedXP = TutorialXP.ScientistKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
-					gainedXP = TutorialXP.NineTailedFoxKill;
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
-					gainedXP = TutorialXP.ChaosKill;
+				if (ev.Target.Team == Team.CDP) gainedXP = PlayerXP.instance.Config.TutorialDclassKill;
+				if (ev.Target.Team == Team.RSC) gainedXP = PlayerXP.instance.Config.TutorialScientistKill;
+				if (ev.Target.Team == Team.MTF) gainedXP = PlayerXP.instance.Config.TutorialMtfKill;
+				if (ev.Target.Team == Team.CHI) gainedXP = PlayerXP.instance.Config.TutorialChaosKill;
 
-				if (gainedXP > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + gainedXP.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, gainedXP);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
-
-			if (ev.Killer.TeamRole.Team == Smod2.API.Team.SCP)
+			else if (ev.Killer.Team == Team.SCP)
 			{
-				if (AllXP.SCPKillPlayer > 0 && ev.Player.SteamId != ev.Killer.SteamId)
+				int gainedXP = 0;
+				if (ev.Target.UserId != ev.Killer.UserId)
 				{
-					ev.Killer.SendConsoleMessage("You have gained " + AllXP.SCPKillPlayer.ToString() + "xp for killing " + ev.Player.Name + "!", "yellow");
-					AddXP(ev.Killer.SteamId, AllXP.SCPKillPlayer);
-				}
+					if (ev.Killer.Role == RoleType.Scp049) gainedXP = PlayerXP.instance.Config.Scp049Kill;
+					else if (ev.Killer.Role == RoleType.Scp0492) gainedXP = PlayerXP.instance.Config.Scp0492Kill;
+					else if (ev.Killer.Role == RoleType.Scp096) gainedXP = PlayerXP.instance.Config.Scp096Kill;
+					else if (ev.Killer.Role == RoleType.Scp106) gainedXP = PlayerXP.instance.Config.Scp106Kill;
+					else if (ev.Killer.Role == RoleType.Scp173) gainedXP = PlayerXP.instance.Config.Scp173Kill;
+					else if (ev.Killer.Role == RoleType.Scp93953 || ev.Killer.Role == RoleType.Scp93989) gainedXP = PlayerXP.instance.Config.Scp939Kill;
 
-				if (TutorialXP.SCPKillsPlayer > 0 && ev.Player.TeamRole.Team != Smod2.API.Team.TUTORIAL && ev.Player.SteamId != ev.Killer.SteamId)
-				{
-					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+					if (gainedXP > 0)
 					{
-						if (player.TeamRole.Role == Role.TUTORIAL)
+						AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					}
+				}
+
+				if (PlayerXP.instance.Config.TutorialScpKillsPlayer > 0 && ev.Target.Team != Team.TUT && ev.Target.UserId != ev.Killer.UserId)
+				{
+					foreach (Player player in Player.List)
+					{
+						if (player.Role == RoleType.Tutorial)
 						{
-							player.SendConsoleMessage("You have gained " + TutorialXP.SCPKillsPlayer.ToString() + "xp for an SCP killing an enemy!", "yellow");
-							AddXP(player.SteamId, TutorialXP.SCPKillsPlayer);
+							AddXP(player.UserId, PlayerXP.instance.Config.TutorialScpKillsPlayer, PlayerXP.instance.Config.TutorialScpKillsPlayerMessage.Replace("{xp}", PlayerXP.instance.Config.TutorialScpKillsPlayer.ToString()).Replace("{target}", ev.Target.Nickname));
 						}
 					}
 				}
 
-				if (SCP079XP.PlayerKilled > 0 && ev.Player.SteamId != ev.Killer.SteamId && ev.Player.TeamRole.Team != Smod2.API.Team.TUTORIAL)
+				if (PlayerXP.instance.Config.Scp079AssistedKill > 0 && ev.Target.UserId != ev.Killer.UserId && ev.Target.Team != Team.TUT)
 				{
-					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+					foreach (Player player in Player.List)
 					{
-						if (player.TeamRole.Role == Role.SCP_079)
-						{
-							player.SendConsoleMessage("You have gained " + SCP079XP.PlayerKilled.ToString() + "xp for another SCP killing an enemy!", "yellow");
-							AddXP(player.SteamId, SCP079XP.PlayerKilled);
+						if (player.Role == RoleType.Scp079)
+						{ 
+							AddXP(player.UserId, PlayerXP.instance.Config.Scp079AssistedKill, PlayerXP.instance.Config.Scp079AssistedKillMessage.Replace("{xp}", PlayerXP.instance.Config.Scp079AssistedKill.ToString()).Replace("{target}", ev.Target.Nickname));
 						}
 					}
 				}
 			}
 
-			if (ev.Player.Name != ev.Killer.Name && ev.Killer != null && ev.Killer.SteamId != string.Empty)
-				ev.Player.SendConsoleMessage("You were killed by " + ev.Killer.Name + ", level " + PlayerXP.GetLevel(ev.Killer.SteamId).ToString() + ".", "yellow");
-			if (ev.Player != null && ev.Player.SteamId != string.Empty)
-				ev.Player.SendConsoleMessage("You have " + PlayerXP.GetXP(ev.Player.SteamId) + PlayerXP.dirSeperator + PlayerXP.XpToLevelUp(ev.Player.SteamId) + "xp until you reach level " + (PlayerXP.GetLevel(ev.Player.SteamId) + 1).ToString() + ".", "yellow");
+			if (ev.Target.Id != ev.Killer.Id && ev.Killer != null && ev.Killer.UserId != string.Empty) SendHint(ev.Target, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(ev.Killer.UserId).ToString()).Replace("{level}", GetXP(ev.Killer.UserId).ToString()));
+			if (ev.Target != null && ev.Target.UserId != string.Empty) ev.Target.SendConsoleMessage($"You have {GetXP(ev.Target.UserId)}/{XpToLevelUp(ev.Target.UserId)} xp until you reach level {GetLevel(ev.Target.UserId) + 1}.</color>", "yellow");
 		}
 
-		public void OnPocketDimensionDie(PlayerPocketDimensionDieEvent ev)
+		public void OnPocketDimensionDie(FailingEscapePocketDimensionEventArgs ev)
 		{
-			if (SCP106XP.DeathInPD > 0)
+			if (isToggled && PlayerXP.instance.Config.Scp106PocketDeath > 0)
 			{
-				foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+				foreach (Player player in Player.List)
 				{
-					if (player.TeamRole.Role == Role.SCP_106 && ev.Player.SteamId != player.SteamId && player.TeamRole.Team != Smod2.API.Team.TUTORIAL && player != null && ev.Player != null && this != null)
+					if (player.Role == RoleType.Scp106 && ev.Player.UserId != player.UserId && player.Team != Team.TUT && player != null && ev.Player != null && this != null)
 					{
-						player.SendConsoleMessage("You have gained " + SCP106XP.DeathInPD.ToString() + "xp for killing " + ev.Player.Name + " in the pocket dimension!", "yellow");
-						ev.Player.SendConsoleMessage("You were killed by " + player.Name + ", level " 
-							+ PlayerXP.GetLevel(player.SteamId).ToString() + ".", "yellow");
-						AddXP(player.SteamId, SCP106XP.DeathInPD);
+						SendHint(ev.Player, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(player.UserId).ToString()).Replace("{level}", GetXP(player.UserId).ToString()));	
+						AddXP(player.UserId, PlayerXP.instance.Config.Scp106PocketDeath, PlayerXP.instance.Config.Scp106PocketDimensionDeathMessage.Replace("{xp}", PlayerXP.instance.Config.Scp106PocketDeath.ToString()).Replace("{target}", ev.Player.Nickname));
 					}
 				}
 			}
 		}
 
-		public void OnRecallZombie(PlayerRecallZombieEvent ev)
+		public void OnRecallZombie(FinishingRecallEventArgs ev)
 		{
-			if (SCP049XP.ZombieCreated > 0 && ev.Player.SteamId != ev.Target.SteamId)
-			{
-				ev.Player.SendConsoleMessage("You have gained " + SCP049XP.ZombieCreated.ToString() + "xp for turning " + ev.Target.Name + " into a zombie!", "yellow");
-				AddXP(ev.Player.SteamId, SCP049XP.ZombieCreated);
+			if (isToggled && PlayerXP.instance.Config.Scp049ZombieCreated > 0 && ev.Scp049.UserId != ev.Target.UserId)
+			{		
+				AddXP(ev.Scp049.UserId, PlayerXP.instance.Config.Scp049ZombieCreated, PlayerXP.instance.Config.Scp049CreateZombieMessage.Replace("{xp}", PlayerXP.instance.Config.Scp049ZombieCreated.ToString()).Replace("{target}", ev.Target.Nickname));
 			}
 		}
 
-		public void OnCheckEscape(PlayerCheckEscapeEvent ev)
+		public void OnCheckEscape(EscapingEventArgs ev)
 		{
-			if (ev.Player.TeamRole.Role == Role.CLASSD)
+			if (!isToggled) return;
+
+			if (ev.Player.Role == RoleType.ClassD)
 			{
-				if (DClassXP.Escape > 0)
+				if (PlayerXP.instance.Config.DclassEscape > 0)
 				{
-					ev.Player.SendConsoleMessage("You have gained " + DClassXP.Escape.ToString() + "xp for escaping as a Class-D!", "yellow");
-					AddXP(ev.Player.SteamId, DClassXP.Escape);
+					AddXP(ev.Player.UserId, PlayerXP.instance.Config.DclassEscape, PlayerXP.instance.Config.DclassEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.DclassEscape.ToString()));
 				}
 
-				if (ChaosXP.DClassEscape > 0 && !ev.Player.IsHandcuffed())
+				if (PlayerXP.instance.Config.ChaosDclassEscape > 0 && !ev.Player.IsCuffed)
 				{
-					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+					foreach (Player player in Player.List)
 					{
-						if (player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
-						{
-							player.SendConsoleMessage("You have gained " + ChaosXP.DClassEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Class-D!", "yellow");
-							AddXP(player.SteamId, ChaosXP.DClassEscape);
+						if (player.Team == Team.CHI)
+						{	
+							AddXP(player.UserId, PlayerXP.instance.Config.ChaosDclassEscape, PlayerXP.instance.Config.ChaosDclassEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.ChaosDclassEscape.ToString()).Replace("{target}", ev.Player.Nickname));
 						}
 					}
 				}
 			}
 
-			if (ev.Player.TeamRole.Role == Role.SCIENTIST)
+			if (ev.Player.Role == RoleType.Scientist)
 			{
-				if (ScientistXP.Escape > 0)
+				if (PlayerXP.instance.Config.ScientistEscape > 0)
 				{
-					ev.Player.SendConsoleMessage("You have gained " + ScientistXP.Escape.ToString() + "xp for escaping as a Scientist!", "yellow");
-					AddXP(ev.Player.SteamId, ScientistXP.Escape);
+					AddXP(ev.Player.UserId, PlayerXP.instance.Config.ScientistEscape, PlayerXP.instance.Config.ScientistEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.ScientistEscape.ToString()).Replace("{target}", ev.Player.Nickname));
 				}
 
-				if (NineTailedFoxXP.ScientistEscape > 0 && !ev.Player.IsHandcuffed())
+				if (PlayerXP.instance.Config.MtfScientistEscape > 0 && !ev.Player.IsCuffed)
 				{
-					foreach (Player player in plugin.pluginManager.Server.GetPlayers())
+					foreach (Player player in Player.List)
 					{
-						if (player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
+						if (player.Team == Team.MTF)
 						{
-							player.SendConsoleMessage("You have gained " + NineTailedFoxXP.ScientistEscape.ToString() + "xp for " + ev.Player.Name + " escaping as a Scientist!", "yellow");
-							AddXP(player.SteamId, NineTailedFoxXP.ScientistEscape);
+							AddXP(player.UserId, PlayerXP.instance.Config.MtfScientistEscape, PlayerXP.instance.Config.MtfScientistEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.MtfScientistEscape.ToString()).Replace("{target}", ev.Player.Nickname));
 						}
 					}
 				}
