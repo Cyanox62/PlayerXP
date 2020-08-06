@@ -18,6 +18,7 @@ namespace PlayerXP
 			string cmd = ev.Name.ToLower();
 			if (cmd == "level" || cmd == "lvl")
 			{
+				ev.Allow = false;
 				Player player = ev.Arguments.Count == 0 ? ev.Player : Player.Get(ev.Arguments[0]);
 				string name;
 				bool hasData = pInfoDict.ContainsKey(player.UserId);
@@ -30,6 +31,7 @@ namespace PlayerXP
 			}
 			else if (cmd == "leaderboard" || cmd == "lb")
 			{
+				ev.Allow = false;
 				string output;
 				int num = 5;
 				if (ev.Arguments.Count > 0 && int.TryParse(ev.Arguments[0], out int n)) num = n;
