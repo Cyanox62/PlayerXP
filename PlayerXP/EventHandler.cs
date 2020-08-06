@@ -9,7 +9,6 @@ namespace PlayerXP
 	partial class EventHandler
 	{
 		public static Dictionary<string, PlayerInfo> pInfoDict = new Dictionary<string, PlayerInfo>();
-		public static Dictionary<string, PlayerInfo> pLeaderboard = new Dictionary<string, PlayerInfo>();
 
 		private bool isRoundStarted = false;
 		private bool isToggled = true;
