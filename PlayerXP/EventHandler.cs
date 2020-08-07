@@ -99,18 +99,12 @@ namespace PlayerXP
 				}
 			}
 			isRoundStarted = false;
-			SaveStats();
-			pInfoDict.Clear();
 		}
 
 		public void OnRoundRestart()
 		{
-			// In case of force restart
-			if (pInfoDict.Count > 0)
-			{
-				SaveStats();
-				pInfoDict.Clear();
-			}
+			SaveStats();
+			pInfoDict.Clear();
 		}
 
 		public void OnPlayerDying(DyingEventArgs ev)

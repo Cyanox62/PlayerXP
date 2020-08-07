@@ -83,7 +83,7 @@ namespace PlayerXP
 
 		private void SaveStats()
 		{
-			Log.Info($"Saving stats for a total of {pInfoDict.Count} players.");
+			if (PlayerXP.instance.Config.IsDebug) Log.Info($"Saving stats for a total of {pInfoDict.Count} players.");
 			foreach (KeyValuePair<string, PlayerInfo> info in pInfoDict)
 			{
 				if (PlayerXP.instance.Config.IsDebug) Log.Info($"Saving stats for {Player.Get(info.Key).Nickname}...");
