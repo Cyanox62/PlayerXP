@@ -140,9 +140,9 @@ namespace PlayerXP
 
 		public void OnPlayerDying(DyingEventArgs ev)
 		{
-			if (!isToggled) return;
+			if (!isToggled || !isRoundStarted) return;
 
-			if (ev.Killer.Team == ev.Target.Team && ev.Killer.UserId != ev.Target.UserId && isRoundStarted && PlayerXP.instance.Config.TeamKillPunishment > 0)
+			if (ev.Killer.Team == ev.Target.Team && ev.Killer.UserId != ev.Target.UserId && PlayerXP.instance.Config.TeamKillPunishment > 0)
 			{
 				int xp = CalcXP(ev.Killer, PlayerXP.instance.Config.TeamKillPunishment);
 				RemoveXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerTeamkillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
@@ -282,7 +282,7 @@ namespace PlayerXP
 
 		public void OnPocketDimensionDie(FailingEscapePocketDimensionEventArgs ev)
 		{
-			if (isToggled && PlayerXP.instance.Config.Scp106PocketDeath > 0)
+			if (isToggled && isRoundStarted && PlayerXP.instance.Config.Scp106PocketDeath > 0)
 			{
 				foreach (Player player in Player.List)
 				{
@@ -298,7 +298,7 @@ namespace PlayerXP
 
 		public void OnRecallZombie(FinishingRecallEventArgs ev)
 		{
-			if (isToggled && PlayerXP.instance.Config.Scp049ZombieCreated > 0 && ev.Scp049.UserId != ev.Target.UserId)
+			if (isToggled && isRoundStarted && PlayerXP.instance.Config.Scp049ZombieCreated > 0 && ev.Scp049.UserId != ev.Target.UserId)
 			{
 				int xp = CalcXP(ev.Scp049, PlayerXP.instance.Config.Scp049ZombieCreated);
 				AddXP(ev.Scp049.UserId, xp, PlayerXP.instance.Config.Scp049CreateZombieMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
@@ -307,7 +307,7 @@ namespace PlayerXP
 
 		public void OnCheckEscape(EscapingEventArgs ev)
 		{
-			if (!isToggled) return;
+			if (!isToggled || !isRoundStarted) return;
 
 			if (ev.Player.IsCuffed)
 			{
