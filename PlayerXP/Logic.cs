@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace PlayerXP
 {
@@ -26,7 +25,7 @@ namespace PlayerXP
 				PlayerInfo info = pInfoDict[userid];
 				Player player = Player.Get(userid);
 				AdjustKarma(player, karmaOverride == -1f ? PlayerXP.instance.Config.KarmaGainedOnGoodDeed : karmaOverride);
-				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? info.karma : 1));
+				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? info.karma : PlayerXP.instance.Config.KarmaInitial));
 				if (msg != null) SendHint(player, $"<color=\"yellow\">{msg}</color>");
 				int calc = (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP;
 				if (info.xp >= calc)
@@ -187,6 +186,11 @@ namespace PlayerXP
 				}
 			}
 			return bestPlayer;
+		}
+
+		private int CalcXP(Player player, int xp)
+		{
+			return (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? pInfoDict.ContainsKey(player.UserId) ? pInfoDict[player.UserId].karma : 1f : PlayerXP.instance.Config.KarmaInitial));
 		}
 	}
 }

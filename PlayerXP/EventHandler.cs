@@ -125,7 +125,8 @@ namespace PlayerXP
 				{
 					if (player.Team != Team.RIP && isRoundStarted)
 					{
-						AddXP(player.UserId, PlayerXP.instance.Config.RoundWin);
+						int xp = CalcXP(player, PlayerXP.instance.Config.RoundWin);
+						AddXP(player.UserId, xp);
 						//AddXP(player.UserId, PlayerXP.instance.Config.RoundWin, $"You have gained {PlayerXP.instance.Config.RoundWin} xp for winning the round!");
 					}
 				}
@@ -144,7 +145,8 @@ namespace PlayerXP
 
 			if (ev.Killer.Team == ev.Target.Team && ev.Killer.UserId != ev.Target.UserId && isRoundStarted && PlayerXP.instance.Config.TeamKillPunishment > 0)
 			{
-				RemoveXP(ev.Killer.UserId, PlayerXP.instance.Config.TeamKillPunishment, PlayerXP.instance.Config.PlayerTeamkillMessage.Replace("{xp}", PlayerXP.instance.Config.TeamKillPunishment.ToString()).Replace("{target}", ev.Target.Nickname));
+				int xp = CalcXP(ev.Killer, PlayerXP.instance.Config.TeamKillPunishment);
+				RemoveXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerTeamkillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 				// Player teamkilled
 			}
 
@@ -163,7 +165,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
+					int xp = CalcXP(ev.Killer, gainedXP);
+					AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
 				}
 			}
 			else if (ev.Killer.Team == Team.RSC)
@@ -181,7 +184,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
+					int xp = CalcXP(ev.Killer, gainedXP);
+					AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
 				}
 			}
 			else if (ev.Killer.Team == Team.MTF)
@@ -194,7 +198,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					int xp = CalcXP(ev.Killer, gainedXP);
+					AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
 			else if (ev.Killer.Team == Team.CHI)
@@ -207,7 +212,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					int xp = CalcXP(ev.Killer, gainedXP);
+					AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
 			else if (ev.Killer.Team == Team.TUT)
@@ -220,7 +226,8 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					int xp = CalcXP(ev.Killer, gainedXP);
+					AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 				}
 			}
 			else if (ev.Killer.Team == Team.SCP)
@@ -237,7 +244,8 @@ namespace PlayerXP
 
 					if (gainedXP > 0)
 					{
-						AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+						int xp = CalcXP(ev.Killer, gainedXP);
+						AddXP(ev.Killer.UserId, xp, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 					}
 				}
 
@@ -247,7 +255,8 @@ namespace PlayerXP
 					{
 						if (player.Role == RoleType.Tutorial)
 						{
-							AddXP(player.UserId, PlayerXP.instance.Config.TutorialScpKillsPlayer, PlayerXP.instance.Config.TutorialScpKillsPlayerMessage.Replace("{xp}", PlayerXP.instance.Config.TutorialScpKillsPlayer.ToString()).Replace("{target}", ev.Target.Nickname));
+							int xp = CalcXP(player, PlayerXP.instance.Config.TutorialScpKillsPlayer);
+							AddXP(player.UserId, xp, PlayerXP.instance.Config.TutorialScpKillsPlayerMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 						}
 					}
 				}
@@ -257,8 +266,9 @@ namespace PlayerXP
 					foreach (Player player in Player.List)
 					{
 						if (player.Role == RoleType.Scp079)
-						{ 
-							AddXP(player.UserId, PlayerXP.instance.Config.Scp079AssistedKill, PlayerXP.instance.Config.Scp079AssistedKillMessage.Replace("{xp}", PlayerXP.instance.Config.Scp079AssistedKill.ToString()).Replace("{target}", ev.Target.Nickname));
+						{
+							int xp = CalcXP(player, PlayerXP.instance.Config.Scp079AssistedKill);
+							AddXP(player.UserId, xp, PlayerXP.instance.Config.Scp079AssistedKillMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 						}
 					}
 				}
@@ -279,8 +289,9 @@ namespace PlayerXP
 				{
 					if (player.Role == RoleType.Scp106 && ev.Player.UserId != player.UserId && player.Team != Team.TUT && player != null && ev.Player != null && this != null)
 					{
+						int xp = CalcXP(player, PlayerXP.instance.Config.Scp106PocketDeath);
 						SendHint(ev.Player, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(player.UserId).ToString()).Replace("{level}", GetLevel(player.UserId).ToString()));	
-						AddXP(player.UserId, PlayerXP.instance.Config.Scp106PocketDeath, PlayerXP.instance.Config.Scp106PocketDimensionDeathMessage.Replace("{xp}", PlayerXP.instance.Config.Scp106PocketDeath.ToString()).Replace("{target}", ev.Player.Nickname));
+						AddXP(player.UserId, xp, PlayerXP.instance.Config.Scp106PocketDimensionDeathMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Player.Nickname));
 					}
 				}
 			}
@@ -289,8 +300,9 @@ namespace PlayerXP
 		public void OnRecallZombie(FinishingRecallEventArgs ev)
 		{
 			if (isToggled && PlayerXP.instance.Config.Scp049ZombieCreated > 0 && ev.Scp049.UserId != ev.Target.UserId)
-			{		
-				AddXP(ev.Scp049.UserId, PlayerXP.instance.Config.Scp049ZombieCreated, PlayerXP.instance.Config.Scp049CreateZombieMessage.Replace("{xp}", PlayerXP.instance.Config.Scp049ZombieCreated.ToString()).Replace("{target}", ev.Target.Nickname));
+			{
+				int xp = CalcXP(ev.Scp049, PlayerXP.instance.Config.Scp049ZombieCreated);
+				AddXP(ev.Scp049.UserId, xp, PlayerXP.instance.Config.Scp049CreateZombieMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Target.Nickname));
 			}
 		}
 
@@ -308,7 +320,8 @@ namespace PlayerXP
 			{
 				if (PlayerXP.instance.Config.DclassEscape > 0)
 				{
-					AddXP(ev.Player.UserId, PlayerXP.instance.Config.DclassEscape, PlayerXP.instance.Config.DclassEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.DclassEscape.ToString()));
+					int xp = CalcXP(ev.Player, PlayerXP.instance.Config.DclassEscape);
+					AddXP(ev.Player.UserId, xp, PlayerXP.instance.Config.DclassEscapeMessage.Replace("{xp}", xp.ToString()));
 				}
 
 				if (PlayerXP.instance.Config.ChaosDclassEscape > 0 && !ev.Player.IsCuffed)
@@ -316,8 +329,9 @@ namespace PlayerXP
 					foreach (Player player in Player.List)
 					{
 						if (player.Team == Team.CHI)
-						{	
-							AddXP(player.UserId, PlayerXP.instance.Config.ChaosDclassEscape, PlayerXP.instance.Config.ChaosDclassEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.ChaosDclassEscape.ToString()).Replace("{target}", ev.Player.Nickname));
+						{
+							int xp = CalcXP(ev.Player, PlayerXP.instance.Config.ChaosDclassEscape);
+							AddXP(player.UserId, xp, PlayerXP.instance.Config.ChaosDclassEscapeMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Player.Nickname));
 						}
 					}
 				}
@@ -327,7 +341,8 @@ namespace PlayerXP
 			{
 				if (PlayerXP.instance.Config.ScientistEscape > 0)
 				{
-					AddXP(ev.Player.UserId, PlayerXP.instance.Config.ScientistEscape, PlayerXP.instance.Config.ScientistEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.ScientistEscape.ToString()).Replace("{target}", ev.Player.Nickname));
+					int xp = CalcXP(ev.Player, PlayerXP.instance.Config.ScientistEscape);
+					AddXP(ev.Player.UserId, xp, PlayerXP.instance.Config.ScientistEscapeMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Player.Nickname));
 				}
 
 				if (PlayerXP.instance.Config.MtfScientistEscape > 0 && !ev.Player.IsCuffed)
@@ -336,7 +351,8 @@ namespace PlayerXP
 					{
 						if (player.Team == Team.MTF)
 						{
-							AddXP(player.UserId, PlayerXP.instance.Config.MtfScientistEscape, PlayerXP.instance.Config.MtfScientistEscapeMessage.Replace("{xp}", PlayerXP.instance.Config.MtfScientistEscape.ToString()).Replace("{target}", ev.Player.Nickname));
+							int xp = CalcXP(ev.Player, PlayerXP.instance.Config.MtfScientistEscape);
+							AddXP(player.UserId, xp, PlayerXP.instance.Config.MtfScientistEscapeMessage.Replace("{xp}", xp.ToString()).Replace("{target}", ev.Player.Nickname));
 						}
 					}
 				}
