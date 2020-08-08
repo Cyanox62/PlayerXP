@@ -5,25 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace PlayerXP
 {
 	partial class EventHandler
 	{
 		private const int baseXP = 1000;
+		private System.Random rand = new System.Random();
 
 		private void SendHint(Player player, string msg, float time = 3f)
 		{
 			player.HintDisplay.Show(new TextHint(msg, new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f), time));
 		}
 
-		private void AddXP(string userid, int xp, string msg = null)
+		private void AddXP(string userid, int xp, string msg = null, bool adjustKarma = true)
 		{
 			if (pInfoDict.ContainsKey(userid))
 			{
 				PlayerInfo info = pInfoDict[userid];
 				Player player = Player.Get(userid);
-				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale);
+				AdjustKarma(player, PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
+				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? info.karma : 1));
 				if (msg != null) SendHint(player, $"<color=\"yellow\">{msg}</color>");
 				int calc = (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP;
 				if (info.xp >= calc)
@@ -63,6 +66,23 @@ namespace PlayerXP
 			if (PlayerXP.instance.Config.IsDebug) Log.Info($"Removing {xp}xp from {Player.Get(userid).Nickname} ({userid}).");
 		}
 
+		private void AdjustKarma(Player player, float amount, bool canOverflow = false)
+		{
+			if (PlayerXP.instance.Config.KarmaEnabled && pInfoDict.ContainsKey(player.UserId))
+			{
+				float final = pInfoDict[player.UserId].karma += amount;
+				Log.Warn("attempting adjust to " + final);
+				Log.Warn(final > PlayerXP.instance.Config.KarmaMaximum);
+				if (final > PlayerXP.instance.Config.KarmaMaximum)
+				{
+					if (canOverflow) pInfoDict[player.UserId].karma = final;
+					else pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMaximum;
+				}
+				else pInfoDict[player.UserId].karma = final;
+			}
+			Log.Warn($"Adjusting player '{player.Nickname}' karma by {amount} to {pInfoDict[player.UserId].karma}");
+		}
+
 		private int GetLevel(string userid)
 		{
 			if (pInfoDict.ContainsKey(userid))
@@ -86,7 +106,7 @@ namespace PlayerXP
 			if (PlayerXP.instance.Config.IsDebug) Log.Info($"Saving stats for a total of {pInfoDict.Count} players.");
 			foreach (KeyValuePair<string, PlayerInfo> info in pInfoDict)
 			{
-				if (PlayerXP.instance.Config.IsDebug) Log.Info($"Saving stats for {Player.Get(info.Key).Nickname}...");
+				if (PlayerXP.instance.Config.IsDebug) Log.Info($"Saving stats for {info.Key}...");
 				File.WriteAllText(Path.Combine(PlayerXP.XPPath, $"{info.Key}.json"), JsonConvert.SerializeObject(info.Value, Formatting.Indented));
 			}
 		}
@@ -112,7 +132,6 @@ namespace PlayerXP
 					continue;
 				}
 				string userid = file.Name.Replace(".json", "");
-				info.karma = 1f;
 				if (PlayerXP.instance.Config.IsDebug) Log.Info($"Loading cached stats for {info.name} ({userid})...");
 				pInfoDict.Add(userid, info);
 			}
@@ -130,6 +149,28 @@ namespace PlayerXP
 					item.id == ItemType.SCP018) return false;
 			}
 			return true;
+		}
+
+		private Player FindEligibleClassd()
+		{
+			Player bestPlayer = null;
+			float highestKarma = PlayerXP.instance.Config.KarmaLabeledBadActor;
+			foreach (Player player in Player.List.Where(x => x.Team == Team.CDP).OrderBy(c => rand.Next()))
+			{
+				if (pInfoDict.ContainsKey(player.UserId))
+				{
+					if (pInfoDict[player.UserId].karma >= PlayerXP.instance.Config.KarmaLabeledBadActor)
+					{
+						return player;
+					}
+					else if (pInfoDict[player.UserId].karma > highestKarma)
+					{
+						bestPlayer = player;
+						highestKarma = pInfoDict[player.UserId].karma;
+					}
+				}
+			}
+			return bestPlayer;
 		}
 	}
 }

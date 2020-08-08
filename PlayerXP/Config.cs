@@ -40,10 +40,10 @@ namespace PlayerXP
 		public float KarmaMinimum { get; set; } = 0f;
 
 		[Description("The maximum amount of karma a player can have.")]
-		public float KarmaMaximum { get; set; } = 1f;
+		public float KarmaMaximum { get; set; } = 1.5f;
 
-		[Description("The maximum amount of karma a player can have with the addition of overflow karma.")]
-		public float KarmaOverflowMaximum { get; set; } = 1.5f;
+		[Description("The amount of karma a player must have to be able to play as SCP.")]
+		public float KarmaLabeledBadActor { get; set; } = 0.5f;
 
 		// --- TRANSLATIONS ---
 

@@ -28,8 +28,8 @@ namespace PlayerXP
 				ev.ReturnMessage =
 					$"Player: {name} ({player.UserId})\n" +
 					$"Level: {(hasData ? pInfoDict[player.UserId].level.ToString() : "[NO DATA]")}\n" +
-					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}\n" +
-					$"Karma {(hasData ? pInfoDict[player.UserId].karma.ToString() : "[NO DATA]")}";
+					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}" + (PlayerXP.instance.Config.KarmaEnabled ? "\n" +
+					$"Karma: {(hasData ? pInfoDict[player.UserId].karma.ToString() : "[NO DATA]")}" : "");
 			}
 			else if (cmd == "leaderboard" || cmd == "lb")
 			{
@@ -52,7 +52,7 @@ namespace PlayerXP
 						if (pInfoDict.Count == i) break;
 						string userid = pInfoDict.ElementAt(i).Key;
 						PlayerInfo info = pInfoDict[userid];
-						output += $"{i + 1}) {info.name} ({userid}) | Level: {info.level} | XP: {info.xp} / {XpToLevelUp(userid)}";
+						output += $"{i + 1}) {info.name} ({userid}) | Level: {info.level} | XP: {info.xp} / {XpToLevelUp(userid)}{(PlayerXP.instance.Config.KarmaEnabled ? $" | Karma: {info.karma}" : "")}";
 						if (i != pInfoDict.Count - 1) output += "\n";
 						else break;
 					}
@@ -87,7 +87,25 @@ namespace PlayerXP
 			UpdateCache();
 		}
 
-		public void OnRoundStart() => isRoundStarted = true;
+		public void OnRoundStart()
+		{
+			isRoundStarted = true;
+
+			foreach (Player player in Player.List.Where(x => x.Team == Team.SCP))
+			{
+				if (pInfoDict.ContainsKey(player.UserId))
+				{
+					if (pInfoDict[player.UserId].karma < PlayerXP.instance.Config.KarmaLabeledBadActor)
+					{
+						// swap this player with another dclass who's eligible
+						Player swap = FindEligibleClassd();
+						swap.SetRole(player.Role);
+						player.SetRole(RoleType.ClassD);
+						break;
+					}
+				}
+			}
+		}
 
 		public void OnRoundEnd(RoundEndedEventArgs ev)
 		{
@@ -117,32 +135,47 @@ namespace PlayerXP
 			if (ev.Killer.Team == ev.Target.Team && ev.Killer.UserId != ev.Target.UserId && isRoundStarted && PlayerXP.instance.Config.TeamKillPunishment > 0)
 			{
 				RemoveXP(ev.Killer.UserId, PlayerXP.instance.Config.TeamKillPunishment, PlayerXP.instance.Config.PlayerTeamkillMessage.Replace("{xp}", PlayerXP.instance.Config.TeamKillPunishment.ToString()).Replace("{target}", ev.Target.Nickname));
+				// Player teamkilled
 			}
 
 			if (ev.Killer.Team == Team.CDP)
 			{
 				int gainedXP = 0;
-				if (ev.Target.Team == Team.RSC) gainedXP = PlayerXP.instance.Config.DclassScientistKill;
+				bool isUnarmed = false;
+				if (ev.Target.Team == Team.RSC)
+				{
+					gainedXP = PlayerXP.instance.Config.DclassScientistKill;
+					// todo: determine if kill was on an unarmed player, punish karma if so
+					isUnarmed = IsUnarmed(ev.Target);
+					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
+				}
 				if (ev.Target.Team == Team.MTF) gainedXP = PlayerXP.instance.Config.DclassMtfKill;
 				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.DclassScpKill;
 				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.DclassTutorialKill;
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), !isUnarmed);
 				}
 			}
 			else if (ev.Killer.Team == Team.RSC)
 			{
 				int gainedXP = 0;
-				if (ev.Target.Team == Team.CDP) gainedXP = PlayerXP.instance.Config.ScientistDclassKill;
+				bool isUnarmed = false;
+				if (ev.Target.Team == Team.CDP)
+				{
+					gainedXP = PlayerXP.instance.Config.ScientistDclassKill;
+					// todo: determine if kill was on an unarmed player, punish karma if so
+					isUnarmed = IsUnarmed(ev.Target);
+					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
+				}
 				if (ev.Target.Team == Team.CHI) gainedXP = PlayerXP.instance.Config.ScientistChaosKill;
 				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.ScientistScpKill;
 				if (ev.Target.Team == Team.TUT) gainedXP = PlayerXP.instance.Config.ScientistTutorialKill;
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname));
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), !isUnarmed);
 				}
 			}
 			else if (ev.Killer.Team == Team.MTF)
@@ -255,6 +288,12 @@ namespace PlayerXP
 		public void OnCheckEscape(EscapingEventArgs ev)
 		{
 			if (!isToggled) return;
+
+			if (ev.Player.IsCuffed)
+			{
+				Player cuffer = Player.Get(ev.Player.CufferId);
+				if (cuffer != null) AdjustKarma(cuffer, PlayerXP.instance.Config.KarmaGainedOnDisarmedEscape, true);
+			}
 
 			if (ev.Player.Role == RoleType.ClassD)
 			{
