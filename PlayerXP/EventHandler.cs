@@ -71,8 +71,18 @@ namespace PlayerXP
 		public void OnRAConsoleCommand(SendingRemoteAdminCommandEventArgs ev)
 		{
 			string cmd = ev.Name.ToLower();
-			if (cmd == "xptoggle") isToggled = false;
-			else if (cmd == "xpsave") SaveStats();
+			if (cmd == "xptoggle")
+			{
+				ev.IsAllowed = false;
+				ev.Sender.RemoteAdminMessage($"XP saving has been toggled {(isToggled ? "on" : "off")}");
+				isToggled = false;
+			}
+			else if (cmd == "xpsave")
+			{
+				ev.IsAllowed = false;
+				ev.Sender.RemoteAdminMessage("Stats saved!");
+				SaveStats();
+			}
 		}
 
 		public void OnPlayerJoin(JoinedEventArgs ev)
