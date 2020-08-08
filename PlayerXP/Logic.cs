@@ -19,7 +19,7 @@ namespace PlayerXP
 			player.HintDisplay.Show(new TextHint(msg, new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f), time));
 		}
 
-		private void AddXP(string userid, int xp, string msg = null, bool adjustKarma = true)
+		private void AddXP(string userid, int xp, string msg = null)
 		{
 			if (pInfoDict.ContainsKey(userid))
 			{
