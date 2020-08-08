@@ -24,7 +24,7 @@ namespace PlayerXP
 		[Description("If karma is enabled.")]
 		public bool KarmaEnabled { get; set; } = true;
 
-		[Description("If a player's karma can exceed the maximum karma only when escorting a detained member of the opposing team.")]
+		[Description("If a player's karma can exceed the maximum karma until the maximum overflow karma when escorting a detained member of the opposing team.")]
 		public bool KarmaOnlyOverflowOnDisarmedEscape { get; set; } = true;
 
 		[Description("How much karma is lost when a player kills another player who doesn't have any weapons.")]
@@ -39,8 +39,14 @@ namespace PlayerXP
 		[Description("The minimum amount of karma a player can have.")]
 		public float KarmaMinimum { get; set; } = 0f;
 
-		[Description("The maximum amount of karma a player can have.")]
-		public float KarmaMaximum { get; set; } = 1.5f;
+		[Description("The amount of karma all players start with.")]
+		public float KarmaInitial { get; set; } = 1f;
+
+		[Description("The maximum amount of karma a player can have without karma overflow.")]
+		public float KarmaMaximum { get; set; } = 1f;
+
+		[Description("The maximum amount of karma a player can have with karma overflow.")]
+		public float KarmaMaximumOverflow { get; set; } = 1.5f;
 
 		[Description("The amount of karma a player must have to be able to play as SCP.")]
 		public float KarmaLabeledBadActor { get; set; } = 0.5f;

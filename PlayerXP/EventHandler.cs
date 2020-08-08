@@ -28,7 +28,7 @@ namespace PlayerXP
 				ev.ReturnMessage =
 					$"Player: {name} ({player.UserId})\n" +
 					$"Level: {(hasData ? pInfoDict[player.UserId].level.ToString() : "[NO DATA]")}\n" +
-					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}" + (PlayerXP.instance.Config.KarmaEnabled ? "\n" +
+					$"XP: {(hasData ? $"{pInfoDict[player.UserId].xp.ToString()} / {XpToLevelUp(player.UserId)}" : "[NO DATA]")}" + (PlayerXP.instance.Config.KarmaEnabled ? "\n" +
 					$"Karma: {(hasData ? pInfoDict[player.UserId].karma.ToString() : "[NO DATA]")}" : "");
 			}
 			else if (cmd == "leaderboard" || cmd == "lb")
@@ -146,7 +146,6 @@ namespace PlayerXP
 				{
 					gainedXP = PlayerXP.instance.Config.DclassScientistKill;
 					isUnarmed = IsUnarmed(ev.Target);
-					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
 				}
 				if (ev.Target.Team == Team.MTF) gainedXP = PlayerXP.instance.Config.DclassMtfKill;
 				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.DclassScpKill;
@@ -154,7 +153,7 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), !isUnarmed);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
 				}
 			}
 			else if (ev.Killer.Team == Team.RSC)
@@ -165,7 +164,6 @@ namespace PlayerXP
 				{
 					gainedXP = PlayerXP.instance.Config.ScientistDclassKill;
 					isUnarmed = IsUnarmed(ev.Target);
-					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
 				}
 				if (ev.Target.Team == Team.CHI) gainedXP = PlayerXP.instance.Config.ScientistChaosKill;
 				if (ev.Target.Team == Team.SCP) gainedXP = PlayerXP.instance.Config.ScientistScpKill;
@@ -173,7 +171,7 @@ namespace PlayerXP
 
 				if (gainedXP > 0 && ev.Target.UserId != ev.Killer.UserId)
 				{
-					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), !isUnarmed);
+					AddXP(ev.Killer.UserId, gainedXP, PlayerXP.instance.Config.PlayerKillMessage.Replace("{xp}", gainedXP.ToString()).Replace("{target}", ev.Target.Nickname), isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : -1f);
 				}
 			}
 			else if (ev.Killer.Team == Team.MTF)
@@ -256,8 +254,11 @@ namespace PlayerXP
 				}
 			}
 
-			if (ev.Target.Id != ev.Killer.Id && ev.Killer != null && ev.Killer.UserId != string.Empty) SendHint(ev.Target, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(ev.Killer.UserId).ToString()).Replace("{level}", GetXP(ev.Killer.UserId).ToString()));
-			if (ev.Target != null && ev.Target.UserId != string.Empty) ev.Target.SendConsoleMessage($"You have {GetXP(ev.Target.UserId)}/{XpToLevelUp(ev.Target.UserId)} xp until you reach level {GetLevel(ev.Target.UserId) + 1}.</color>", "yellow");
+			if (ev.Killer.Id != ev.Target.Id)
+			{
+				SendHint(ev.Target, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(ev.Killer.UserId).ToString()).Replace("{level}", GetLevel(ev.Killer.UserId).ToString()).Replace("{killer}", ev.Killer.Nickname));
+				ev.Target.SendConsoleMessage($"You have {GetXP(ev.Target.UserId)}/{XpToLevelUp(ev.Target.UserId)} xp until you reach level {GetLevel(ev.Target.UserId) + 1}.", "yellow");
+			}
 		}
 
 		public void OnPocketDimensionDie(FailingEscapePocketDimensionEventArgs ev)
@@ -268,7 +269,7 @@ namespace PlayerXP
 				{
 					if (player.Role == RoleType.Scp106 && ev.Player.UserId != player.UserId && player.Team != Team.TUT && player != null && ev.Player != null && this != null)
 					{
-						SendHint(ev.Player, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(player.UserId).ToString()).Replace("{level}", GetXP(player.UserId).ToString()));	
+						SendHint(ev.Player, PlayerXP.instance.Config.PlayerDeathMessage.Replace("{xp}", GetXP(player.UserId).ToString()).Replace("{level}", GetLevel(player.UserId).ToString()));	
 						AddXP(player.UserId, PlayerXP.instance.Config.Scp106PocketDeath, PlayerXP.instance.Config.Scp106PocketDimensionDeathMessage.Replace("{xp}", PlayerXP.instance.Config.Scp106PocketDeath.ToString()).Replace("{target}", ev.Player.Nickname));
 					}
 				}

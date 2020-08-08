@@ -12,7 +12,7 @@
 			this.name = name;
 			level = 1;
 			xp = 0;
-			karma = 1f;
+			karma = PlayerXP.instance.Config.KarmaInitial;
 		}
 	}
 }

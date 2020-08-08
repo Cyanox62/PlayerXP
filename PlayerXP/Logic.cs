@@ -19,13 +19,13 @@ namespace PlayerXP
 			player.HintDisplay.Show(new TextHint(msg, new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f), time));
 		}
 
-		private void AddXP(string userid, int xp, string msg = null, bool adjustKarma = true)
+		private void AddXP(string userid, int xp, string msg = null, float karmaOverride = -1f)
 		{
 			if (pInfoDict.ContainsKey(userid))
 			{
 				PlayerInfo info = pInfoDict[userid];
 				Player player = Player.Get(userid);
-				if (adjustKarma) AdjustKarma(player, PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
+				AdjustKarma(player, karmaOverride == -1f ? PlayerXP.instance.Config.KarmaGainedOnGoodDeed : karmaOverride);
 				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? info.karma : 1));
 				if (msg != null) SendHint(player, $"<color=\"yellow\">{msg}</color>");
 				int calc = (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP;
@@ -75,10 +75,26 @@ namespace PlayerXP
 				Log.Warn(final > PlayerXP.instance.Config.KarmaMaximum);
 				if (final > PlayerXP.instance.Config.KarmaMaximum)
 				{
-					if (canOverflow) pInfoDict[player.UserId].karma = final;
-					else pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMaximum;
+					if (canOverflow)
+					{
+						if (final > PlayerXP.instance.Config.KarmaMaximumOverflow)
+						{
+							pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMaximumOverflow;
+						}
+						else
+						{
+							pInfoDict[player.UserId].karma = final;
+						}
+					}
+					else
+					{
+						pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMaximum;
+					}
 				}
-				else pInfoDict[player.UserId].karma = final;
+				else
+				{
+					pInfoDict[player.UserId].karma = final;
+				}
 			}
 			Log.Warn($"Adjusting player '{player.Nickname}' karma by {amount} to {pInfoDict[player.UserId].karma}");
 		}
@@ -116,7 +132,7 @@ namespace PlayerXP
 			if (pInfoDict.ContainsKey(userid))
 			{
 				PlayerInfo info = pInfoDict[userid];
-				return (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP + PlayerXP.instance.Config.XpIncrement - info.xp;
+				return (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP + PlayerXP.instance.Config.XpIncrement;
 			}
 			else return -1;
 		}
