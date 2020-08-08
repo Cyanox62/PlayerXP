@@ -107,7 +107,6 @@ namespace PlayerXP
 				{
 					if (pInfoDict[player.UserId].karma < PlayerXP.instance.Config.KarmaLabeledBadActor)
 					{
-						// swap this player with another dclass who's eligible
 						Player swap = FindEligibleClassd();
 						swap.SetRole(player.Role);
 						player.SetRole(RoleType.ClassD);
