@@ -145,7 +145,6 @@ namespace PlayerXP
 				if (ev.Target.Team == Team.RSC)
 				{
 					gainedXP = PlayerXP.instance.Config.DclassScientistKill;
-					// todo: determine if kill was on an unarmed player, punish karma if so
 					isUnarmed = IsUnarmed(ev.Target);
 					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
 				}
@@ -165,7 +164,6 @@ namespace PlayerXP
 				if (ev.Target.Team == Team.CDP)
 				{
 					gainedXP = PlayerXP.instance.Config.ScientistDclassKill;
-					// todo: determine if kill was on an unarmed player, punish karma if so
 					isUnarmed = IsUnarmed(ev.Target);
 					AdjustKarma(ev.Killer, isUnarmed ? -PlayerXP.instance.Config.KarmaLostOnDefenselessKill : PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
 				}

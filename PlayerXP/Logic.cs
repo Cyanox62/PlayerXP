@@ -19,13 +19,13 @@ namespace PlayerXP
 			player.HintDisplay.Show(new TextHint(msg, new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f), time));
 		}
 
-		private void AddXP(string userid, int xp, string msg = null)
+		private void AddXP(string userid, int xp, string msg = null, bool adjustKarma = true)
 		{
 			if (pInfoDict.ContainsKey(userid))
 			{
 				PlayerInfo info = pInfoDict[userid];
 				Player player = Player.Get(userid);
-				AdjustKarma(player, PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
+				if (adjustKarma) AdjustKarma(player, PlayerXP.instance.Config.KarmaGainedOnGoodDeed);
 				info.xp += (int)(xp * PlayerXP.instance.Config.XpScale * (PlayerXP.instance.Config.KarmaEnabled ? info.karma : 1));
 				if (msg != null) SendHint(player, $"<color=\"yellow\">{msg}</color>");
 				int calc = (info.level - 1) * PlayerXP.instance.Config.XpIncrement + baseXP;
