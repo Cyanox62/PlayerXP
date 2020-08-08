@@ -25,12 +25,15 @@ namespace PlayerXP
 			Exiled.Events.Handlers.Server.SendingConsoleCommand += ev.OnConsoleCommand;
 			Exiled.Events.Handlers.Server.SendingRemoteAdminCommand += ev.OnRAConsoleCommand;
 			Exiled.Events.Handlers.Server.RoundStarted += ev.OnRoundStart;
+			Exiled.Events.Handlers.Server.RestartingRound += ev.OnRoundRestart;
 			Exiled.Events.Handlers.Server.RoundEnded += ev.OnRoundEnd;
 			Exiled.Events.Handlers.Player.Joined += ev.OnPlayerJoin;
 			Exiled.Events.Handlers.Player.Dying += ev.OnPlayerDying;
 			Exiled.Events.Handlers.Player.FailingEscapePocketDimension += ev.OnPocketDimensionDie;
 			Exiled.Events.Handlers.Scp049.FinishingRecall += ev.OnRecallZombie;
 			Exiled.Events.Handlers.Player.Escaping += ev.OnCheckEscape;
+			Exiled.Events.Handlers.Player.Handcuffing += ev.OnHandcuff;
+			Exiled.Events.Handlers.Player.RemovingHandcuffs += ev.OnRemovingHandcuff;
 		}
 
 		public override void OnDisabled() 
@@ -41,12 +44,15 @@ namespace PlayerXP
 			Exiled.Events.Handlers.Server.SendingConsoleCommand -= ev.OnConsoleCommand;
 			Exiled.Events.Handlers.Server.SendingRemoteAdminCommand -= ev.OnRAConsoleCommand;
 			Exiled.Events.Handlers.Server.RoundStarted -= ev.OnRoundStart;
+			Exiled.Events.Handlers.Server.RestartingRound -= ev.OnRoundRestart;
 			Exiled.Events.Handlers.Server.RoundEnded -= ev.OnRoundEnd;
 			Exiled.Events.Handlers.Player.Joined -= ev.OnPlayerJoin;
 			Exiled.Events.Handlers.Player.Dying -= ev.OnPlayerDying;
 			Exiled.Events.Handlers.Player.FailingEscapePocketDimension -= ev.OnPocketDimensionDie;
 			Exiled.Events.Handlers.Scp049.FinishingRecall -= ev.OnRecallZombie;
 			Exiled.Events.Handlers.Player.Escaping -= ev.OnCheckEscape;
+			Exiled.Events.Handlers.Player.Handcuffing -= ev.OnHandcuff;
+			Exiled.Events.Handlers.Player.RemovingHandcuffs -= ev.OnRemovingHandcuff;
 
 			ev = null;
 		}

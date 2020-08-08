@@ -112,10 +112,24 @@ namespace PlayerXP
 					continue;
 				}
 				string userid = file.Name.Replace(".json", "");
+				info.karma = 1f;
 				if (PlayerXP.instance.Config.IsDebug) Log.Info($"Loading cached stats for {info.name} ({userid})...");
 				pInfoDict.Add(userid, info);
 			}
 			pInfoDict = pInfoDict.OrderByDescending(x => x.Value.level).ThenByDescending(x => x.Value.xp).ToDictionary(x => x.Key, x => x.Value);
+		}
+
+		private bool IsUnarmed(Player player)
+		{
+			foreach (var item in player.Inventory.items)
+			{
+				if (item.id == ItemType.GrenadeFrag || item.id == ItemType.GunCOM15 ||
+					item.id == ItemType.GunE11SR || item.id == ItemType.GunLogicer ||
+					item.id == ItemType.GunMP7 || item.id == ItemType.GunProject90 ||
+					item.id == ItemType.GunUSP || item.id == ItemType.MicroHID ||
+					item.id == ItemType.SCP018) return false;
+			}
+			return true;
 		}
 	}
 }

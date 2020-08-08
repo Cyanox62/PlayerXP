@@ -9,6 +9,7 @@ namespace PlayerXP
 	partial class EventHandler
 	{
 		public static Dictionary<string, PlayerInfo> pInfoDict = new Dictionary<string, PlayerInfo>();
+		public static Dictionary<Player, Player> pCuffedDict = new Dictionary<Player, Player>();
 
 		private bool isRoundStarted = false;
 		private bool isToggled = true;
@@ -27,7 +28,8 @@ namespace PlayerXP
 				ev.ReturnMessage =
 					$"Player: {name} ({player.UserId})\n" +
 					$"Level: {(hasData ? pInfoDict[player.UserId].level.ToString() : "[NO DATA]")}\n" +
-					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}";
+					$"XP: {(hasData ? pInfoDict[player.UserId].xp.ToString() : "[NO DATA]")}\n" +
+					$"Karma {(hasData ? pInfoDict[player.UserId].karma.ToString() : "[NO DATA]")}";
 			}
 			else if (cmd == "leaderboard" || cmd == "lb")
 			{
@@ -80,6 +82,8 @@ namespace PlayerXP
 
 		public void OnWaitingForPlayers()
 		{
+			pCuffedDict.Clear();
+			pInfoDict.Clear();
 			UpdateCache();
 		}
 
@@ -104,7 +108,6 @@ namespace PlayerXP
 		public void OnRoundRestart()
 		{
 			SaveStats();
-			pInfoDict.Clear();
 		}
 
 		public void OnPlayerDying(DyingEventArgs ev)
@@ -290,6 +293,17 @@ namespace PlayerXP
 					}
 				}
 			}
+		}
+
+		public void OnHandcuff(HandcuffingEventArgs ev)
+		{
+			if (!pCuffedDict.ContainsKey(ev.Cuffer)) pCuffedDict.Add(ev.Cuffer, ev.Target);
+			else pCuffedDict[ev.Cuffer] = ev.Target;
+		}
+
+		public void OnRemovingHandcuff(RemovingHandcuffsEventArgs ev)
+		{
+			if (pCuffedDict.ContainsKey(ev.Cuffer) && pCuffedDict[ev.Cuffer] != null) pCuffedDict[ev.Cuffer] = null;
 		}
 	}
 }

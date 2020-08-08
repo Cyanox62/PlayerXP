@@ -5,6 +5,8 @@ namespace PlayerXP
 {
 	public class Config : IConfig
 	{
+		// --- GENERAL SETTINGS ---
+
 		[Description("Whether or not the plugin is enabled.")]
 		public bool IsEnabled { get; set; } = true;
 
@@ -16,6 +18,34 @@ namespace PlayerXP
 
 		[Description("How much more XP it should take to get to the next level than the previous one.")]
 		public int XpIncrement { get; set; } = 250;
+
+		// --- KARMA ---
+
+		[Description("If karma is enabled.")]
+		public bool KarmaEnabled { get; set; } = true;
+
+		[Description("If a player's karma can exceed the maximum karma only when escorting a detained member of the opposing team.")]
+		public bool KarmaOnlyOverflowOnDisarmedEscape { get; set; } = true;
+
+		[Description("How much karma is lost when a player kills another player who doesn't have any weapons.")]
+		public float KarmaLostOnDefenselessKill { get; set; } = 0.1f;
+
+		[Description("How much karma is gained when a player does a good deed.")]
+		public float KarmaGainedOnGoodDeed { get; set; } = 0.05f;
+
+		[Description("How much karma is gained for escorting a detained member of the opposing team.")]
+		public float KarmaGainedOnDisarmedEscape { get; set; } = 0.1f;
+
+		[Description("The minimum amount of karma a player can have.")]
+		public float KarmaMinimum { get; set; } = 0f;
+
+		[Description("The maximum amount of karma a player can have.")]
+		public float KarmaMaximum { get; set; } = 1f;
+
+		[Description("The maximum amount of karma a player can have with the addition of overflow karma.")]
+		public float KarmaOverflowMaximum { get; set; } = 1.5f;
+
+		// --- TRANSLATIONS ---
 
 		[Description("The text a player is shown for killing another player.")]
 		public string PlayerKillMessage { get; set; } = "You have gained {xp} xp for killing {target}!";
@@ -50,6 +80,7 @@ namespace PlayerXP
 		[Description("The text shown to MTF for a Scientist escaping.")]
 		public string MtfScientistEscapeMessage { get; set; } = "You have gained {xp} xp for {target} escaping as a Scientist!";
 
+		// --- XP VALUES ---
 		// All
 		public int RoundWin { get; set; } = 200;
 		public int TeamKillPunishment { get; set; } = 200;
