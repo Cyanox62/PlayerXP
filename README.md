@@ -26,7 +26,7 @@ Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 * All data transfer between servers.
 
 # API
-Developers can access and modify data about each player through the API. After referencing this assembly, add the namespace `PlayerXP.API` to your file. You will then be able to access severl useful methods to retrieve and change data through the `PXP` class.
+Developers can access and modify data about each player through the API. After referencing this assembly, add the namespace `PlayerXP.API` to your file. You will then be able to access several useful methods to retrieve and modify data through the `PXP` class.
 
 # Commands
 
