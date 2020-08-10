@@ -25,6 +25,11 @@ Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 * When a player is killed, the victim gets a message displaying the killers level.
 * All data transfer between servers.
 
+# API
+Developers can access and modify data about each player through the API. After referencing this assembly, add the namespace `PlayerXP.API` to your file. You will then be able to access severl useful methods to retrieve and change data through the `PXP` class.
+
+# Commands
+
 **Commands that can be run from both RA console and player console. These commands must use the prefix `.` if they are being run through the player console.**
 
 | Command        | Value Type | Description |
