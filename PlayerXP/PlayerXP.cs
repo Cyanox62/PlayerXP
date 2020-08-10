@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Exiled.API.Features;
+using PlayerXP.API;
 
 namespace PlayerXP
 {
@@ -20,6 +21,7 @@ namespace PlayerXP
 
 			instance = this;
 			ev = new EventHandler();
+			PXP.singleton = ev;
 
 			Exiled.Events.Handlers.Server.WaitingForPlayers += ev.OnWaitingForPlayers;
 			Exiled.Events.Handlers.Server.SendingConsoleCommand += ev.OnConsoleCommand;
