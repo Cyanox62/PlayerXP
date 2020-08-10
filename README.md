@@ -2,8 +2,6 @@
 
 A plugin that adds a leveling system to your server. Users start at level 1, and gain experience through doing tasks such as escaping as a classd or scientist, winning the round, killing an SCP, etc.
 
-Click [here](https://github.com/Cyanox62/PlayerXP/wiki/XP-Config-Settings) for a full list of config settings/rates of xp.
-
 # Installation
 
 **[EXILED](https://github.com/galaxy119/EXILED) must be installed.**
@@ -15,7 +13,12 @@ Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 * Scale factor for all xp values
 * All xp rates are configurable, as well as all messages displayed to users for gaining xp.
 * Players will be given small configurable messages on their screen to notify them when they gain xp, as well as level up.
-* Fully configurable karma system, where users will gain karma for doing good deeds, and lose karma for bad deeds such as killing unarmed Class-D or Scientists.
+* Fully configurable karma system.
+  * Players will gain karma for doing good deeds
+  * Players will lost karma for doing bad deeds such as killing unarmed Class-D or Scientists.
+  * Karma is an xp multiplier, all players start with a karma of 1.00
+  * Players with karma below a certain amount can be denied the ability to play SCP.
+  * This system can be toggled on and off.
 * Commands that can be run through RA console **or** client console by using the prefix `.` to check the level, xp, and server ranking of a user, as well as the server leaderboard.
 * Commands to calculate a server leaderboard based off a configurable size and check a player's level.
 * Levels get increasingly harder to achieve, the amount in which is takes to achieve the next level can be modified.
