@@ -9,8 +9,8 @@ A plugin that adds a leveling system to your server. Users start at level 1, and
 Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 
 # Features
-* Grants xp to players for completing game tasks
-* Scale factor for all xp values
+* Grants xp to players for completing game tasks.
+* Scale factor for all xp values.
 * All xp rates are configurable, as well as all messages displayed to users for gaining xp.
 * Players will be given small configurable messages on their screen to notify them when they gain xp, as well as level up.
 * Fully configurable karma system.
