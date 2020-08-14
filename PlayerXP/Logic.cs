@@ -90,6 +90,10 @@ namespace PlayerXP
 						pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMaximum;
 					}
 				}
+				else if (final < PlayerXP.instance.Config.KarmaMinimum)
+				{
+					pInfoDict[player.UserId].karma = PlayerXP.instance.Config.KarmaMinimum;
+				}
 				else
 				{
 					pInfoDict[player.UserId].karma = final;
