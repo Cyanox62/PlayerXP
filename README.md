@@ -9,8 +9,8 @@ A plugin that adds a leveling system to your server. Users start at level 1, and
 Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 
 # Features
-* Grants xp to players for completing game tasks
-* Scale factor for all xp values
+* Grants xp to players for completing game tasks.
+* Scale factor for all xp values.
 * All xp rates are configurable, as well as all messages displayed to users for gaining xp.
 * Players will be given small configurable messages on their screen to notify them when they gain xp, as well as level up.
 * Fully configurable karma system.
@@ -24,6 +24,11 @@ Place the `PlayerXP.dll` file in your `Exiled/Plugins` folder.
 * Levels get increasingly harder to achieve, the amount in which is takes to achieve the next level can be modified.
 * When a player is killed, the victim gets a message displaying the killers level.
 * All data transfer between servers.
+
+# API
+Developers can access and modify data about each player through the API. After referencing this assembly, add the namespace `PlayerXP.API` to your file. You will then be able to access several useful methods to retrieve and modify data through the `PXP` class.
+
+# Commands
 
 **Commands that can be run from both RA console and player console. These commands must use the prefix `.` if they are being run through the player console.**
 
