@@ -84,7 +84,7 @@ namespace PlayerXP
 			}
 		}
 
-		public void OnPlayerJoin(JoinedEventArgs ev)
+		public void OnPlayerJoin(VeifiedEventArgs ev)
 		{
 			if (!File.Exists(Path.Combine(PlayerXP.XPPath, $"{ev.Player.UserId}.json"))) pInfoDict.Add(ev.Player.UserId, new PlayerInfo(ev.Player.Nickname));
 		}
